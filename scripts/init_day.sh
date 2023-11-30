@@ -2,7 +2,7 @@
 
 AOC_DAY="$1"
 
-[[ -z "$AOC_DAY" ]] && echo "Error: AoC day must be passed as first argument" && exit 10
+[[ -z "${AOC_DAY}" ]] && echo "Error: AoC day must be passed as first argument" && exit 10
 
 cat <<EOT >> "src/main/scala/Day${AOC_DAY}.scala"
 def day${AOC_DAY}: Int = 42
