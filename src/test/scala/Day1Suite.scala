@@ -45,23 +45,23 @@ class Day1Suite extends ScalaCheckSuite {
   }
 
   test("getDigits(\"eightwothree\") == List(Eight, Three)") {
-    assertEquals(getDigits("eightwothree"), List(Eight, Three))
+    assertEquals(getDigits("eightwothree"), List(Eight, Two, Three))
   }
 
   test("getDigits(\"abcone2threexyz\") == List(One, Two, Three)") {
     assertEquals(getDigits("abcone2threexyz"), List(One, Two, Three))
   }
 
-  test("getDigits(\"xtwone3four\") == List(Two, Three, Four)") {
-    assertEquals(getDigits("xtwone3four"), List(Two, Three, Four))
+  test("getDigits(\"xtwone3four\") == List(Two, One, Three, Four)") {
+    assertEquals(getDigits("xtwone3four"), List(Two, One, Three, Four))
   }
 
   test("getDigits(\"4nineeightseven2\") == List(Four, Nine, Eight, Seven, Two)") {
     assertEquals(getDigits("4nineeightseven2"), List(Four, Nine, Eight, Seven, Two))
   }
 
-  test("getDigits(\"zoneight234\") == List(One, Two, Three, Four)") {
-    assertEquals(getDigits("zoneight234"), List(One, Two, Three, Four))
+  test("getDigits(\"zoneight234\") == List(One, Eight, Two, Three, Four)") {
+    assertEquals(getDigits("zoneight234"), List(One, Eight, Two, Three, Four))
   }
 
   test("getDigits(\"7pqrstsixteen\") == List(Seven, Six)") {
@@ -70,6 +70,10 @@ class Day1Suite extends ScalaCheckSuite {
 
   test("getDigits(\"one279seven\") == List(One, Two, Seven, Nine, Seven)") {
     assertEquals(getDigits("one279seven"), List(One, Two, Seven, Nine, Seven))
+  }
+
+  test("getDigits(\"sevenzbfvlpn7tkhmxtvgvfeightwobsb\") == List(Seven, Seven, Eight, Two)") {
+    assertEquals(getDigits("sevenzbfvlpn7tkhmxtvgvfeightwobsb"), List(Seven, Seven, Eight, Two))
   }
 
   test("getFancyCalibrations(mediumInput) == Some(List(29, 83, 13, 24, 42, 14, 76))") {
@@ -106,9 +110,9 @@ class Day1Suite extends ScalaCheckSuite {
     )
   }
 
-//  test("getFancyCalibrationsSum(bigInput) == Some(Calibration(???))") {
-//    assertEquals(getFancyCalibrationsSum(bigInput), Some(Calibration(123)))
-//  }
+  test("getFancyCalibrationsSum(bigInput) == Some(Calibration(53_515))") {
+    assertEquals(getFancyCalibrationsSum(bigInput), Some(Calibration(53_515)))
+  }
 
 }
 object Day1Suite {
