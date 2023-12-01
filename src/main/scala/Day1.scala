@@ -11,21 +11,26 @@ object AmendedCalibration {
 opaque type Calibration = Int
 object Calibration {
 
-  implicit val monoid: Monoid[Calibration] = Monoid.instance[Calibration](
-    emptyValue = 0,
-    cmb = (c1, c2) => Calibration((c1: Int) + (c2: Int))
-  )
+  given Monoid[Calibration] with
+    val empty: Calibration = 0
+    def combine(c1: Calibration, c2: Calibration): Calibration = (c1: Int) + (c2: Int)
 
   def apply(i: Int): Calibration = i
 
   def from(ac: AmendedCalibration): Option[Calibration] =
     val chars = ac.toList
-    (chars.find(_.isDigit).map(_.asDigit), chars.findLast(_.isDigit).map(_.asDigit)).mapN(from)
+    (
+      chars.find(_.isDigit).map(_.asDigit),
+      chars.findLast(_.isDigit).map(_.asDigit)
+    ).mapN(from)
 
   def from(digits: List[Digit]): Option[Calibration] =
-    (digits.headOption.map(_.toInt), digits.lastOption.map(_.toInt)).mapN(from)
+    (
+      digits.headOption.map(_.toInt),
+      digits.lastOption.map(_.toInt)
+    ).mapN(from)
 
-  def from(first: Int, last: Int): Calibration = Calibration(10 * first + last)
+  def from(first: Int, last: Int): Calibration = 10 * first + last
 
 }
 
@@ -43,7 +48,7 @@ enum Digit derives CanEqual {
 }
 object Digit {
 
-  def fromFirstDigitChar(s: String): Option[Digit] =
+  def fromDigitCharPrefix(s: String): Option[Digit] =
     s.toList match
       case '1' :: _ => Some(One)
       case '2' :: _ => Some(Two)
@@ -70,21 +75,21 @@ object Digit {
       case _                                    => None
 
   def fromSlidingPrefixOf(s: String): (Option[Digit], String) =
-    val optDigit = fromFirstDigitChar(s).orElse(fromWordPrefix(s))
+    val optDigit = fromDigitCharPrefix(s).orElse(fromWordPrefix(s))
     (optDigit, optDigit.fold(ifEmpty = s)(_ => s.drop(1)))
 
 }
 
 def getDigits(input: String): List[Digit] =
   @tailrec
-  def aux(acc: List[Digit], chars: List[Char]): List[Digit] =
-    chars match
-      case Nil     => acc
+  def aux(acc: List[Digit], s: String): List[Digit] =
+    s.toList match
+      case Nil => acc
       case _ :: cs =>
-        val (optDigit, rest)  = Digit.fromSlidingPrefixOf(chars.mkString)
-        val (newAcc, newRest) = optDigit.fold(ifEmpty = (acc, cs))(d => (d :: acc, rest.toList))
+        val (optDigit, rest) = Digit.fromSlidingPrefixOf(s)
+        val (newAcc, newRest) = optDigit.fold(ifEmpty = (acc, cs.mkString))(d => (d :: acc, rest))
         aux(newAcc, newRest)
-  aux(List.empty, input.toList).reverse
+  aux(List.empty, input).reverse
 
 def getFancyCalibrations(inputs: List[String]): Option[List[Calibration]] =
   inputs.map(getDigits).traverse(Calibration.from)
