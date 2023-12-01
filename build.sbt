@@ -14,16 +14,16 @@ lazy val root = project
   .in(file("."))
   .settings(
     organization := "com.horothesun",
-    name         := "advent-of-code-2023",
+    name := "advent-of-code-2023",
     scalaVersion := "3.3.1",
     libraryDependencies ++= Seq(
-      "org.typelevel" %% "cats-core"           % catsVersion,
-      "org.typelevel" %% "kittens"             % kittensVersion,
-      "co.fs2"        %% "fs2-core"            % fs2Version,
-      "org.typelevel" %% "cats-laws"           % catsVersion            % Test,
-      "org.scalameta" %% "munit"               % munitVersion           % Test,
-      "org.scalameta" %% "munit-scalacheck"    % munitVersion           % Test,
-      "org.typelevel" %% "discipline-munit"    % disciplineMunitVersion % Test,
+      "org.typelevel" %% "cats-core" % catsVersion,
+      "org.typelevel" %% "kittens" % kittensVersion,
+      "co.fs2" %% "fs2-core" % fs2Version,
+      "org.typelevel" %% "cats-laws" % catsVersion % Test,
+      "org.scalameta" %% "munit" % munitVersion % Test,
+      "org.scalameta" %% "munit-scalacheck" % munitVersion % Test,
+      "org.typelevel" %% "discipline-munit" % disciplineMunitVersion % Test,
       "org.typelevel" %% "munit-cats-effect-3" % munitCatsEffectVersion % Test
     ),
     scalacOptions ++= Seq(
