@@ -4,16 +4,14 @@ import scala.annotation.tailrec
 import Digit.*
 
 opaque type AmendedCalibration = String
-object AmendedCalibration {
+object AmendedCalibration:
   def apply(input: String): AmendedCalibration = input
-}
 
 opaque type Calibration = Int
-object Calibration {
-
+object Calibration:
   given Monoid[Calibration] with
     val empty: Calibration = 0
-    def combine(c1: Calibration, c2: Calibration): Calibration = (c1: Int) + (c2: Int)
+    def combine(c1: Calibration, c2: Calibration): Calibration = c1 + c2
 
   def apply(i: Int): Calibration = i
 
@@ -32,22 +30,17 @@ object Calibration {
 
   def from(first: Int, last: Int): Calibration = 10 * first + last
 
-}
-
 def getCalibrations(inputs: List[String]): Option[List[Calibration]] =
   inputs.map(AmendedCalibration.apply).traverse(Calibration.from)
 
 def getCalibrationsSum(inputs: List[String]): Option[Calibration] = getCalibrations(inputs).map(_.combineAll)
 
-enum Digit derives CanEqual {
-
+enum Digit derives CanEqual:
   case One, Two, Three, Four, Five, Six, Seven, Eight, Nine
 
   def toInt: Int = 1 + this.ordinal
 
-}
-object Digit {
-
+object Digit:
   def fromDigitCharPrefix(s: String): Option[Digit] = s.toList match
     case '1' :: _ => Some(One)
     case '2' :: _ => Some(Two)
@@ -75,8 +68,6 @@ object Digit {
   def fromSlidingPrefixOf(s: String): (Option[Digit], String) =
     val optDigit = fromDigitCharPrefix(s).orElse(fromWordPrefix(s))
     (optDigit, optDigit.fold(ifEmpty = s)(_ => s.drop(1)))
-
-}
 
 def getDigits(input: String): List[Digit] =
   @tailrec

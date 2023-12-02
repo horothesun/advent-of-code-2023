@@ -2,7 +2,7 @@ import munit.ScalaCheckSuite
 import Digit.*
 import Day1Suite.*
 
-class Day1Suite extends ScalaCheckSuite {
+class Day1Suite extends ScalaCheckSuite:
 
   test("Calibration.from(AmendedCalibration.from(\"1abc2\")) == Some(12)") {
     assertEquals(Calibration.from(AmendedCalibration("1abc2")), Some(Calibration(12)))
@@ -114,9 +114,5 @@ class Day1Suite extends ScalaCheckSuite {
     assertEquals(getFancyCalibrationsSum(bigInput), Some(Calibration(53_515)))
   }
 
-}
-object Day1Suite {
-
+object Day1Suite:
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day1_input.txt")
-
-}
