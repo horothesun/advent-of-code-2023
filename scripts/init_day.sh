@@ -19,16 +19,13 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop.*
 import Day${AOC_DAY}Suite.*
 
-class Day${AOC_DAY}Suite extends ScalaCheckSuite {
+class Day${AOC_DAY}Suite extends ScalaCheckSuite:
 
   test("day${AOC_DAY} == 42") {
     assertEquals(day${AOC_DAY}, 42)
   }
 
-}
-object Day${AOC_DAY}Suite {
+object Day${AOC_DAY}Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day${AOC_DAY}_input.txt")
-
-}
 EOT
