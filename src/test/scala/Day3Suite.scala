@@ -1,6 +1,4 @@
 import munit.ScalaCheckSuite
-import org.scalacheck.Gen
-import org.scalacheck.Prop.*
 import Day3Suite.*
 
 class Day3Suite extends ScalaCheckSuite:
@@ -46,6 +44,8 @@ class Day3Suite extends ScalaCheckSuite:
 
 object Day3Suite:
 
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day3_input.txt")
+
   val smallInput: List[String] = List(
     "467..114..",
     "...*......",
@@ -88,5 +88,3 @@ object Day3Suite:
       Annotated(PartNumber(598), pos0Based = 5, length = 3)
     )
   )
-
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day3_input.txt")

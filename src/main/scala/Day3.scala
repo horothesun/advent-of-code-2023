@@ -14,11 +14,13 @@ object PartNumber:
 
 case class Part(s: Symbol, pn: PartNumber)
 
-case class Annotated[+A](a: A, pos0Based: Int, length: Int) derives Functor, Traverse
+case class Annotated[+A](value: A, pos0Based: Int, length: Int) derives Functor, Traverse
 
 type Literal = Symbol | PartNumber
 
-def parseRow(s: String): Option[List[Annotated[Literal]]] =
+type Row = List[Annotated[Literal]]
+
+def parseRow(s: String): Option[Row] =
   val (lastPartNumber, optLits) = s.toList.zipWithIndex
     .foldLeft[(Option[Annotated[String]], List[Option[Annotated[Literal]]])]((None, List.empty)) {
       case ((nextPartNumber, acc), (c, pos)) =>
@@ -28,7 +30,7 @@ def parseRow(s: String): Option[List[Annotated[Literal]]] =
           case d if d.isDigit =>
             val annotatedDigit = Annotated(s"$d", pos, length = 1)
             nextPartNumber.fold(ifEmpty = (Some(annotatedDigit), acc)) { npn =>
-              val newNpn = Annotated(s"${npn.a}$d", pos0Based = npn.pos0Based, length = 1 + npn.length)
+              val newNpn = Annotated(s"${npn.value}$d", pos0Based = npn.pos0Based, length = 1 + npn.length)
               (Some(newNpn), acc)
             }
           case sym =>
@@ -39,7 +41,7 @@ def parseRow(s: String): Option[List[Annotated[Literal]]] =
     }
   optLits.sequence.map(ls => lastPartNumber.flatMap(_.traverse(PartNumber.from)).fold(ifEmpty = ls)(ls :+ _))
 
-def parse(input: List[String]): Option[List[List[Annotated[Literal]]]] = input.traverse(parseRow)
+def parse(input: List[String]): Option[List[Row]] = input.traverse(parseRow)
 
 val annotatedSymbol: PartialFunction[Annotated[Literal], Annotated[Symbol]] =
   case Annotated(Symbol(c), p, l) => Annotated(Symbol(c), p, l)
@@ -51,20 +53,20 @@ def getMatchingPart(apn: Annotated[PartNumber], as: Annotated[Symbol]): Option[P
   if (
     as.pos0Based >= apn.pos0Based - 1 &&
     as.pos0Based <= apn.pos0Based + apn.length
-  ) Some(Part(as.a, apn.a))
+  ) Some(Part(as.value, apn.value))
   else None
 
-def getParts(rows: List[List[Annotated[Literal]]]): List[Part] =
-  val emptyRow = List.empty[Annotated[Literal]]
-  val prevCurrNextRows =
-    (emptyRow :: rows)
-      .zip(rows)
-      .zip(rows.drop(1) :+ emptyRow)
-      .map { case ((p, c), n) => (p, c, n) }
-  prevCurrNextRows.flatMap { case (prev, curr, next) =>
-    curr.collect(annotatedPartNumber).flatMap { apn =>
-      List(prev, curr, next).flatMap(_.collect(annotatedSymbol).mapFilter[Part](getMatchingPart(apn, _)))
-    }
+def getParts(prev: Row, curr: Row, next: Row): List[Part] =
+  curr.collect(annotatedPartNumber).flatMap { apn =>
+    val symbols = List(prev, curr, next).flatMap(_.collect(annotatedSymbol))
+    symbols.mapFilter(getMatchingPart(apn, _))
   }
+
+def getParts(rows: List[Row]): List[Part] =
+  val emptyRow = List.empty[Annotated[Literal]]
+  (emptyRow :: rows)
+    .zip(rows)
+    .zip(rows.drop(1) :+ emptyRow)
+    .flatMap { case ((prev, curr), next) => getParts(prev, curr, next) }
 
 def getPartNumbersSum(input: List[String]): Option[Int] = parse(input).map(rows => getParts(rows).map(_.pn.n).sum)
