@@ -4,7 +4,7 @@ import cats.Traverse
 
 val DOT_CHAR = '.'
 
-case class Symbol(c: Char)
+case class Symbol(c: Char) derives CanEqual
 object Symbol:
   def from(c: Char): Option[Symbol] = if (c == DOT_CHAR || c.isDigit) None else Some(Symbol(c))
 
@@ -62,11 +62,34 @@ def getParts(prev: Row, curr: Row, next: Row): List[Part] =
     symbols.mapFilter(getMatchingPart(apn, _))
   }
 
-def getParts(rows: List[Row]): List[Part] =
+def getPrevCurrNextRowTuples(rows: List[Row]): List[(Row, Row, Row)] =
   val emptyRow = List.empty[Annotated[Literal]]
   (emptyRow :: rows)
     .zip(rows)
     .zip(rows.drop(1) :+ emptyRow)
-    .flatMap { case ((prev, curr), next) => getParts(prev, curr, next) }
+    .map { case ((prev, curr), next) => (prev, curr, next) }
+
+def getParts(rows: List[Row]): List[Part] = getPrevCurrNextRowTuples(rows).flatMap(getParts.tupled)
 
 def getPartNumbersSum(input: List[String]): Option[Int] = parse(input).map(rows => getParts(rows).map(_.pn.n).sum)
+
+case class Gear(pn1: PartNumber, pn2: PartNumber):
+  val ratio: Int = pn1.n * pn2.n
+object Gear:
+  val SYMBOL: Symbol = Symbol('*')
+
+def getGears(prev: Row, curr: Row, next: Row): List[Gear] =
+  curr
+    .collect(annotatedSymbol)
+    .collect { case as @ Annotated(Gear.SYMBOL, _, _) => as }
+    .mapFilter { as =>
+      val allPartNumbers = List(prev, curr, next).flatMap(_.collect(annotatedPartNumber))
+      val matchingParts = allPartNumbers.mapFilter(getMatchingPart(_, as))
+      matchingParts match
+        case p1 :: p2 :: Nil => Some(Gear(p1.pn, p2.pn))
+        case _               => None
+    }
+
+def getGears(rows: List[Row]): List[Gear] = getPrevCurrNextRowTuples(rows).flatMap(getGears.tupled)
+
+def getGearsRatioSum(input: List[String]): Option[Int] = parse(input).map(rows => getGears(rows).map(_.ratio).sum)

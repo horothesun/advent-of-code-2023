@@ -34,12 +34,20 @@ class Day3Suite extends ScalaCheckSuite:
     )
   }
 
-  test("getPartNumbersSum(smallInput) returns Some(4361)") {
+  test("getPartNumbersSum(smallInput) == Some(4361)") {
     assertEquals(getPartNumbersSum(smallInput), Some(4361))
   }
 
-  test("getPartNumbersSum(bigInput) returns Some(554_003)") {
+  test("getPartNumbersSum(bigInput) == Some(554_003)") {
     assertEquals(getPartNumbersSum(bigInput), Some(554_003))
+  }
+
+  test("getGearsRatioSum(smallInput) == Some(467_835)") {
+    assertEquals(getGearsRatioSum(smallInput), Some(467_835))
+  }
+
+  test("getGearsRatioSum(bigInput) == Some(87_263_515)") {
+    assertEquals(getGearsRatioSum(bigInput), Some(87_263_515))
   }
 
 object Day3Suite:
