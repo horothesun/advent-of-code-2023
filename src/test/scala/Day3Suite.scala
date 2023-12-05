@@ -58,7 +58,7 @@ object Day3Suite:
     "...$.*....",
     ".664.598.."
   )
-  val smallRows: List[List[Annotated[Literal]]] = List(
+  val smallRows: List[Row] = List(
     List(
       Annotated(PartNumber(467), pos0Based = 0, length = 3),
       Annotated(PartNumber(114), pos0Based = 5, length = 3)
