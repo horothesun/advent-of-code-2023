@@ -1,6 +1,6 @@
 import cats.derived.*
 import cats.implicits.*
-import cats.{Functor, Traverse}
+import cats.Traverse
 
 val DOT_CHAR = '.'
 
@@ -14,7 +14,7 @@ object PartNumber:
 
 case class Part(s: Symbol, pn: PartNumber)
 
-case class Annotated[+A](value: A, pos0Based: Int, length: Int) derives Functor, Traverse
+case class Annotated[+A](value: A, pos0Based: Int, length: Int) derives Traverse
 
 type Literal = Symbol | PartNumber
 
