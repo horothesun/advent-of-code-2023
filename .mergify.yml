@@ -1,15 +1,17 @@
 pull_request_rules:
 
-- name: Automatically approve Scala Steward PRs
+- name: Automatically approve bot PRs
   conditions: &base_merge_conditions
-  - author=horothesun-scala-steward[bot]
   - status-success=test
   - status-success=lint
+  - or:
+    - author=horothesun-scala-steward[bot]
+    - author=horothesun-renovate[bot]
   actions:
     review:
       type: APPROVE
 
-- name: Automatically merge Scala Steward PRs
+- name: Automatically merge bot PRs
   conditions:
   - and: *base_merge_conditions
   - and:
