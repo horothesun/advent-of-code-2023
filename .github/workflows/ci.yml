@@ -29,12 +29,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
+      - uses: actions/checkout@v4
+
       - name: Get JDK version
         run: |
           source scripts/get_java_version.sh
           echo "JAVA_VERSION=${JAVA_VERSION}" >> "${GITHUB_ENV}"
-
-      - uses: actions/checkout@v4
 
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
