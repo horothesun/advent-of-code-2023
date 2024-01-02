@@ -5,4 +5,4 @@ ARG JAVA_VERSION=17
 
 FROM eclipse-temurin:${JAVA_VERSION}-jdk-jammy AS builder
 
-FROM eclipse-temurin:${JAVA_VERSION}-jdk-jammy
+FROM public.ecr.aws/lambda/java:${JAVA_VERSION}
