@@ -16,6 +16,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
+
       - name: Run ShellCheck
         uses: ludeeus/action-shellcheck@2.0.0
         env:
@@ -28,12 +29,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 3
     steps:
+      - name: Get JDK version
+        run: |
+          source scripts/get_java_version.sh
+          echo "JAVA_VERSION=${JAVA_VERSION}" >> "${GITHUB_ENV}"
+
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+
       - name: Run tests
         run: sbt test
 
@@ -41,11 +49,27 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
+      - name: Get JDK version
+        run: |
+          source scripts/get_java_version.sh
+          echo "JAVA_VERSION=${JAVA_VERSION}" >> "${GITHUB_ENV}"
+
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+
+      - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
-          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: "temurin"
+
       - name: Check
         run: sbt scalafmtSbtCheck scalafmtCheck Test/scalafmtCheck
+
+  build-dockerfile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Dockerfile
+        run: docker build --file "./Dockerfile" "."

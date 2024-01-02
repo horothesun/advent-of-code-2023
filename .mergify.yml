@@ -5,6 +5,7 @@ pull_request_rules:
   - status-success=shellcheck
   - status-success=test
   - status-success=lint
+  - status-success=build-dockerfile
   - or:
     - author=horothesun-scala-steward[bot]
     - author=horothesun-renovate[bot]
