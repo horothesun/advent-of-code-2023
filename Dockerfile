@@ -3,4 +3,6 @@
 
 ARG JAVA_VERSION=17
 
+FROM eclipse-temurin:${JAVA_VERSION}-jdk-jammy AS builder
+
 FROM eclipse-temurin:${JAVA_VERSION}-jdk-jammy
