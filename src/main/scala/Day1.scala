@@ -35,7 +35,7 @@ def getCalibrations(inputs: List[String]): Option[List[Calibration]] =
 
 def getCalibrationsSum(inputs: List[String]): Option[Calibration] = getCalibrations(inputs).map(_.combineAll)
 
-enum Digit derives CanEqual:
+enum Digit:
   case One, Two, Three, Four, Five, Six, Seven, Eight, Nine
 
   def toInt: Int = 1 + this.ordinal

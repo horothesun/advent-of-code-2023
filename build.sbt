@@ -32,7 +32,6 @@ lazy val root = project
       "UTF-8",
       "-feature",
       "-unchecked",
-      "-language:strictEquality",
       "-language:postfixOps",
       "-source:future",
       "-explain",

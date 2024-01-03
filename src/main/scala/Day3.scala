@@ -4,7 +4,7 @@ import cats.Traverse
 
 val DOT_CHAR = '.'
 
-case class Symbol(c: Char) derives CanEqual
+case class Symbol(c: Char)
 object Symbol:
   def from(c: Char): Option[Symbol] = if (c == DOT_CHAR || c.isDigit) None else Some(Symbol(c))
 

@@ -19,7 +19,7 @@ object Color:
     case "blue"  => Some(Blue)
     case _       => None
 
-enum Validity derives CanEqual:
+enum Validity:
   case Possible, Impossible
 
 object Validity:

@@ -1,6 +1,6 @@
 import cats.implicits.*
 
-case class CardId(value: Int) derives CanEqual
+case class CardId(value: Int)
 object CardId:
   def from(s: String): Option[CardId] = whitespaceMerged(s).split(' ') match
     case Array("Card", idStr) => idStr.toIntOption.map(CardId.apply)
@@ -8,7 +8,7 @@ object CardId:
 
 def whitespaceMerged(s: String): String = consecutivesDeduped(s.toList, toDedupe = ' ').mkString
 
-def consecutivesDeduped[A](as: List[A], toDedupe: A)(using CanEqual[A, A]): List[A] =
+def consecutivesDeduped[A](as: List[A], toDedupe: A): List[A] =
   as.foldLeft(List.empty[A]) { case (acc, a) =>
     acc match
       case Nil                               => List(a)
