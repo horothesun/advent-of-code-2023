@@ -49,10 +49,10 @@ def getNewCardIds(c: Card): List[CardId] =
   List.range(base, base + c.getMatches.length).map(CardId.apply)
 
 def getTotalCardInstances(cards: List[Card]): Map[CardId, Int] =
-  val initial = cards.foldLeft(Map.empty[CardId, Int]) { case (instancesById, c) => instancesById.updated(c.id, 1) }
-  cards.foldLeft(initial) { case (instancesById, c) =>
-    val numbOfCs = instancesById.getOrElse(c.id, 0)
-    getNewCardIds(c).foldLeft(instancesById) { case (isByIds, id) => isByIds.updatedWith(id)(_.map(numbOfCs + _)) }
+  val initial = cards.map(c => (c.id, 1)).toMap
+  cards.foldLeft(initial) { case (countByCardId, c) =>
+    val numbOfCs = countByCardId.getOrElse(c.id, 0)
+    getNewCardIds(c).foldLeft(countByCardId) { case (nById, id) => nById.updatedWith(id)(_.map(numbOfCs + _)) }
   }
 
 def getTotalCards(cards: List[Card]): Int = getTotalCardInstances(cards).toList.map { case (_, n) => n }.sum
