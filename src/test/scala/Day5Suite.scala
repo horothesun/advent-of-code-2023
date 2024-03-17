@@ -21,11 +21,8 @@ class Day5Suite extends ScalaCheckSuite:
     assertEquals(completeCoreMapping(100), 100L)
   }
 
-  test("parse seeds") {
-    assertEquals(
-      parseSeeds("seeds: 79 14 55 13"),
-      Some(List(Seed(79), Seed(14), Seed(55), Seed(13)))
-    )
+  test("parse seed longs") {
+    assertEquals(parseSeedLongs("seeds: 79 14 55 13"), Some(List(79L, 14L, 55L, 13L)))
   }
 
   test("parse category map items") {
@@ -62,7 +59,7 @@ class Day5Suite extends ScalaCheckSuite:
   }
 
   test("smallInput parse correctly") {
-    val expectedSeeds = List(Seed(79), Seed(14), Seed(55), Seed(13))
+    val expectedSeedLongs = List(79L, 14L, 55L, 13L)
     val expectedCategoryMappings = CategoryMappings(
       seedToSoil = List(
         CategoryMapItem(destination = 50, source = 98, length = 2),
@@ -97,7 +94,7 @@ class Day5Suite extends ScalaCheckSuite:
         CategoryMapItem(destination = 56, source = 93, length = 4)
       )
     )
-    assertEquals(parseInputs(smallInput), Some((expectedSeeds, expectedCategoryMappings)))
+    assertEquals(parseInputs(smallInput), Some((expectedSeedLongs, expectedCategoryMappings)))
   }
 
   test("smallInput's min location is 35") {
@@ -107,6 +104,21 @@ class Day5Suite extends ScalaCheckSuite:
   test("bigInput's min location is 226_172_555") {
     assertEquals(getMinLocation(bigInput), Some(Location(226_172_555)))
   }
+
+  test("\"seeds: 79 14 55 13\" extended seeds are List(79, ..., 92, 55, ..., 67)") {
+    assertEquals(
+      getExtendedSeeds(List(79L, 14L, 55L, 13L)).map(_.toList),
+      Some((Range.Long(79L, 93L, step = 1L).toList ++ Range.Long(55L, 68L, step = 1L).toList).map(Seed.apply))
+    )
+  }
+
+  test("smallInput's min location w/ extended seeds is 46") {
+    assertEquals(getMinLocationWithExtendedSeeds(smallInput), Some(Location(46)))
+  }
+
+//  test("bigInput's min location w/ extended seeds is 46") {
+//    assertEquals(getMinLocationWithExtendedSeeds(bigInput), Some(Location(46)))
+//  }
 
 object Day5Suite:
 

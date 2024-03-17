@@ -1,4 +1,6 @@
 import cats.implicits.*
+import fs2.{Pure, Stream}
+import scala.annotation.tailrec
 import scala.math.Ordering
 
 trait Identified:
@@ -105,15 +107,15 @@ object CompleteCategoryMappings:
     val dFromS = getCompleteCoreMapping(cms)
     src => dest.cons(dFromS(src.id))
 
-def parseSeeds(input: String): Option[List[Seed]] = input.split(": ") match
-  case Array("seeds", ids) => ids.split(' ').toList.traverse(_.toLongOption.map(Seed.apply))
+def parseSeedLongs(input: String): Option[List[Long]] = input.split(": ") match
+  case Array("seeds", ids) => ids.split(' ').toList.traverse(_.toLongOption)
   case _                   => None
 
 def parseCategoryMapItems(title: String, inputs: List[String]): Option[List[CategoryMapItem]] = inputs match
   case head :: tail if head == title => tail.traverse(CategoryMapItem.from)
   case _                             => None
 
-def parseInputs(inputs: List[String]): Option[(List[Seed], CategoryMappings)] = split(by = "", inputs) match
+def parseInputs(inputs: List[String]): Option[(List[Long], CategoryMappings)] = split(by = "", inputs) match
   case (seeds :: Nil) ::
       seedToSoil ::
       soilToFertilizer ::
@@ -124,7 +126,7 @@ def parseInputs(inputs: List[String]): Option[(List[Seed], CategoryMappings)] = 
       humidityToLocation ::
       Nil =>
     (
-      parseSeeds(seeds),
+      parseSeedLongs(seeds),
       (
         parseCategoryMapItems(title = "seed-to-soil map:", seedToSoil),
         parseCategoryMapItems(title = "soil-to-fertilizer map:", soilToFertilizer),
@@ -153,4 +155,40 @@ def getMinLocation(seeds: List[Seed], cms: CategoryMappings): Option[Location] =
   seeds.map(seedToLocation).minOption
 
 def getMinLocation(inputs: List[String]): Option[Location] =
-  parseInputs(inputs).flatMap { case (seeds, cms) => getMinLocation(seeds, cms) }
+  parseInputs(inputs).flatMap { case (ls, cms) => getMinLocation(seeds = ls.map(Seed.apply), cms) }
+
+//def getExtendedSeeds(ns: List[Long]): Option[List[Seed]] =
+//  @tailrec
+//  def aux(ls: List[Long], accOpt: Option[List[Seed]]): Option[List[Seed]] =
+//    if (accOpt.isEmpty) None
+//    else
+//      ls match
+//        case Nil            => accOpt
+//        case n :: l :: tail => aux(tail, accOpt.map(_ ++ Range.Long(n, n + l, step = 1L).toList.map(Seed.apply)))
+//        case _              => None
+//
+//  aux(ns, Some(List.empty))
+
+def getMinLocationWithExtendedSeeds(inputs: List[String]): Option[Location] =
+  parseInputs(inputs).flatMap { case (ls, cms) =>
+    getExtendedSeeds(ls).flatMap { seeds => // getMinLocation(seeds, cms)
+      val seedToLocation = CompleteCategoryMappings.from(cms).seedToLocation
+      seeds
+        .map(seedToLocation)
+        .scan[Option[Location]](None) { case (currMinOpt, l) =>
+          currMinOpt.fold[Option[Location]](ifEmpty = Some(l))(currMin => Some(Ordering[Location].min(currMin, l)))
+        }
+        .compile
+        .last
+        .flatten
+    }
+  }
+
+def getExtendedSeeds(ns: List[Long]): Option[Stream[Pure, Seed]] =
+  @tailrec
+  def aux(ls: List[Long], acc: Option[Stream[Pure, Seed]]): Option[Stream[Pure, Seed]] =
+    ls match
+      case Nil            => acc
+      case n :: l :: tail => aux(tail, acc.map(_ ++ Stream.range(n, n + l).map(Seed.apply)))
+      case _              => None
+  aux(ns, Some(Stream.empty))
