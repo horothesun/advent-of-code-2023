@@ -123,28 +123,18 @@ class Day4Suite extends ScalaCheckSuite:
     assertEquals(getNewCardIds(card6), List.empty[CardId])
   }
 
-  test("smallDeck generates 1 instance of card 1") {
-    assertEquals(getTotalCardInstances(smallDeck).get(CardId(1)), Some(1))
-  }
-
-  test("smallDeck generates 2 instances of card 2") {
-    assertEquals(getTotalCardInstances(smallDeck).get(CardId(2)), Some(2))
-  }
-
-  test("smallDeck generates 4 instances of card 3") {
-    assertEquals(getTotalCardInstances(smallDeck).get(CardId(3)), Some(4))
-  }
-
-  test("smallDeck generates 8 instances of card 4") {
-    assertEquals(getTotalCardInstances(smallDeck).get(CardId(4)), Some(8))
-  }
-
-  test("smallDeck generates 14 instances of card 5") {
-    assertEquals(getTotalCardInstances(smallDeck).get(CardId(5)), Some(14))
-  }
-
-  test("smallDeck generates 1 instances of card 6") {
-    assertEquals(getTotalCardInstances(smallDeck).get(CardId(6)), Some(1))
+  test("smallDeck generates the right number of card instances") {
+    assertEquals(
+      getTotalCardInstances(smallDeck),
+      Map(
+        CardId(1) -> 1,
+        CardId(2) -> 2,
+        CardId(3) -> 4,
+        CardId(4) -> 8,
+        CardId(5) -> 14,
+        CardId(6) -> 1
+      )
+    )
   }
 
   test("smallDeck generates a total of 30 card instances") {
