@@ -45,6 +45,33 @@ class Day6Suite extends ScalaCheckSuite:
     )
   }
 
+  test("get all possible distances from time allowance") {
+    assertEquals(
+      getAllPossibleDistances(allowance = Time(7)),
+      List(0, 6, 10, 12, 12, 10, 6, 0).map(Distance.apply)
+    )
+  }
+
+  test("number of ways to beat the 9mm record with a 7ms allowance") {
+    assertEquals(countWaysToWin(Race(allowance = Time(7), best = Distance(9))), 4)
+  }
+
+  test("number of ways to beat the 40mm record with a 15ms allowance") {
+    assertEquals(countWaysToWin(Race(allowance = Time(15), best = Distance(40))), 8)
+  }
+
+  test("number of ways to beat the 200mm record with a 30ms allowance") {
+    assertEquals(countWaysToWin(Race(allowance = Time(30), best = Distance(200))), 9)
+  }
+
+  test("multiplied ways to win on smallInput is 288") {
+    assertEquals(getMultipliedWaysToWin(smallInput), Some(288))
+  }
+
+  test("multiplied ways to win on bigInput is 293_046") {
+    assertEquals(getMultipliedWaysToWin(bigInput), Some(293_046))
+  }
+
 object Day6Suite:
 
   val bigInput: List[String] = List(
