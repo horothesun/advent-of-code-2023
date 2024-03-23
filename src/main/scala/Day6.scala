@@ -27,13 +27,13 @@ def countWaysToWin_bruteForce(r: Race): Long = getAllPossibleDistances(r.allowan
 
 def getMultipliedWaysToWin_bruteForce(rs: List[Race]): Long = rs.map(countWaysToWin_bruteForce).product
 
-def waysToLoseLeft(race: Race): Long =
-  waysToLose(startHold = Time(0), isHoldInBounds = _ <= race.allowance, nextHold = _.inc, race)
+def countWaysToLoseLeft(race: Race): Long =
+  countWaysToLose(startHold = Time(0), isHoldInBounds = _ <= race.allowance, nextHold = _.inc, race)
 
-def waysToLoseRight(race: Race): Long =
-  waysToLose(startHold = race.allowance, isHoldInBounds = _ >= Time(0), nextHold = _.dec, race)
+def countWaysToLoseRight(race: Race): Long =
+  countWaysToLose(startHold = race.allowance, isHoldInBounds = _ >= Time(0), nextHold = _.dec, race)
 
-def waysToLose(startHold: Time, isHoldInBounds: Time => Boolean, nextHold: Time => Time, race: Race): Long =
+def countWaysToLose(startHold: Time, isHoldInBounds: Time => Boolean, nextHold: Time => Time, race: Race): Long =
   List
     .unfold[Distance, Time](startHold) { hold =>
       if (isHoldInBounds(hold))
@@ -43,9 +43,8 @@ def waysToLose(startHold: Time, isHoldInBounds: Time => Boolean, nextHold: Time 
     }
     .length
 
-def waysToWin(r: Race, losses: Long): Long = 1 + r.allowance.millis - losses
-
 def countWaysToWin(r: Race): Long =
-  val lossesFromLeft = waysToLoseLeft(r)
-  val losses = lossesFromLeft + (if (lossesFromLeft == 1 + r.allowance.millis) 0 else waysToLoseRight(r))
-  waysToWin(r, losses)
+  val totalOutcomes = 1 + r.allowance.millis
+  val lossesFromLeft = countWaysToLoseLeft(r)
+  val losses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(r))
+  totalOutcomes - losses
