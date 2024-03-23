@@ -1,42 +1,51 @@
-//import cats.derived.*
 import cats.implicits.*
 import scala.math.Ordering.Implicits.infixOrderingOps
+import scala.math.Numeric.Implicits.infixNumericOps
 
-case class Time(millis: Int)
+case class Time(millis: Long):
+  def inc: Time = Time(millis + 1)
+  def dec: Time = Time(millis - 1)
 
-case class Distance(millimeters: Int)
+object Time:
+  given Numeric[Time] = Numeric[Long].imap(Time.apply)(_.millis)
+
+case class Distance(millimeters: Long)
 object Distance:
   given Ordering[Distance] = Ordering.by(_.millimeters)
 
-case class Race(allowance: Time, best: Distance)
+case class Race(allowance: Time, record: Distance)
 
-def parseRaces(input: List[String]): Option[List[Race]] = input match
-  case ts :: ds :: Nil =>
-    (parseTimes(ts), parseDistances(ds)).flatMapN((times, distances) =>
-      if (times.length != distances.length) None else Some(times.zip(distances).map(Race.apply))
-    )
-  case _ => None
-
-def parseAs[T](apply: Int => T, s: String): Option[List[T]] =
-  s.split(' ').toList.filterNot(_.isEmpty).traverse(_.toIntOption.map(apply))
-
-def parseTimes(times: String): Option[List[Time]] = times.toList match
-  case 'T' :: 'i' :: 'm' :: 'e' :: ':' :: ts => parseAs(Time.apply, ts.mkString)
-  case _                                     => None
-
-def parseDistances(distances: String): Option[List[Distance]] = distances.toList match
-  case 'D' :: 'i' :: 's' :: 't' :: 'a' :: 'n' :: 'c' :: 'e' :: ':' :: ds => parseAs(Distance.apply, ds.mkString)
-  case _                                                                 => None
+def getTravelledDistance(allowance: Time, hold: Time): Distance =
+  val raceDuration = allowance - hold
+  val speed = hold.millis
+  Distance(speed * raceDuration.millis)
 
 def getAllPossibleDistances(allowance: Time): List[Distance] =
-  List.range[Int](0, 1 + allowance.millis).map { holdMillis =>
-    val raceDuration = allowance.millis - holdMillis
-    val speed = holdMillis
-    Distance(speed * raceDuration)
-  }
+  List.range[Long](0, 1 + allowance.millis).map(holdMillis => getTravelledDistance(allowance, hold = Time(holdMillis)))
 
-def countWaysToWin(r: Race): Int = getAllPossibleDistances(r.allowance).count(_ > r.best)
+def countWaysToWin_bruteForce(r: Race): Long = getAllPossibleDistances(r.allowance).count(_ > r.record)
 
-def getMultipliedWaysToWin(rs: List[Race]): Int = rs.map(countWaysToWin).product
+def getMultipliedWaysToWin_bruteForce(rs: List[Race]): Long = rs.map(countWaysToWin_bruteForce).product
 
-def getMultipliedWaysToWin(inputs: List[String]): Option[Int] = parseRaces(inputs).map(getMultipliedWaysToWin)
+def waysToLoseLeft(race: Race): Long =
+  waysToLose(startHold = Time(0), isHoldInBounds = _ <= race.allowance, nextHold = _.inc, race)
+
+def waysToLoseRight(race: Race): Long =
+  waysToLose(startHold = race.allowance, isHoldInBounds = _ >= Time(0), nextHold = _.dec, race)
+
+def waysToLose(startHold: Time, isHoldInBounds: Time => Boolean, nextHold: Time => Time, race: Race): Long =
+  List
+    .unfold[Distance, Time](startHold) { hold =>
+      if (isHoldInBounds(hold))
+        val travelled = getTravelledDistance(race.allowance, hold)
+        if (race.record >= travelled) Some((travelled, nextHold(hold))) else None
+      else None
+    }
+    .length
+
+def waysToWin(r: Race, losses: Long): Long = 1 + r.allowance.millis - losses
+
+def countWaysToWin(r: Race): Long =
+  val lossesFromLeft = waysToLoseLeft(r)
+  val losses = lossesFromLeft + (if (lossesFromLeft == 1 + r.allowance.millis) 0 else waysToLoseRight(r))
+  waysToWin(r, losses)
