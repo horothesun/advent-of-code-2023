@@ -170,13 +170,14 @@ def getMinLocation(inputs: List[String]): Option[Location] =
 //  aux(ns, Some(List.empty))
 
 def getMinLocationWithExtendedSeeds(inputs: List[String]): Option[Location] =
-  parseInputs(inputs).flatMap { case (ls, cms) =>
-    getExtendedSeeds(ls).flatMap { seeds => // getMinLocation(seeds, cms)
+  parseInputs(inputs).flatMap { case (ns, cms) =>
+    getExtendedSeeds(ns).flatMap { seeds =>
       val seedToLocation = CompleteCategoryMappings.from(cms).seedToLocation
       seeds
         .map(seedToLocation)
         .scan[Option[Location]](None) { case (currMinOpt, l) =>
-          currMinOpt.fold[Option[Location]](ifEmpty = Some(l))(currMin => Some(Ordering[Location].min(currMin, l)))
+          // println(s"$l")
+          currMinOpt.fold(ifEmpty = Some(l))(currMin => Some(Ordering[Location].min(currMin, l)))
         }
         .compile
         .last
