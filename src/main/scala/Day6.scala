@@ -20,10 +20,14 @@ def getTravelledDistance(allowance: Time, hold: Time): Distance =
   val speed = hold.millis
   Distance(speed * raceDuration.millis)
 
-def getAllPossibleDistances(allowance: Time): List[Distance] =
-  List.range[Long](0, 1 + allowance.millis).map(holdMillis => getTravelledDistance(allowance, hold = Time(holdMillis)))
+def getTotalOutcomes(allowance: Time): Long = 1 + allowance.millis
 
-def countWaysToWin_bruteForce(r: Race): Long = getAllPossibleDistances(r.allowance).count(_ > r.record)
+def getAllPossibleDistances(allowance: Time): List[Distance] =
+  List
+    .range[Long](0, getTotalOutcomes(allowance))
+    .map(holdMillis => getTravelledDistance(allowance, hold = Time(holdMillis)))
+
+def countWaysToWin_bruteForce(race: Race): Long = getAllPossibleDistances(race.allowance).count(_ > race.record)
 
 def getMultipliedWaysToWin_bruteForce(rs: List[Race]): Long = rs.map(countWaysToWin_bruteForce).product
 
@@ -51,8 +55,8 @@ def countWaysToLose(startHold: Time, isHoldInBounds: Time => Boolean, nextHold: 
     }
     .length
 
-def countWaysToWin(r: Race): Long =
-  val totalOutcomes = 1 + r.allowance.millis
-  val lossesFromLeft = countWaysToLoseLeft(r)
-  val allLosses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(r))
+def countWaysToWin(race: Race): Long =
+  val totalOutcomes = getTotalOutcomes(race.allowance)
+  val lossesFromLeft = countWaysToLoseLeft(race)
+  val allLosses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(race))
   totalOutcomes - allLosses
