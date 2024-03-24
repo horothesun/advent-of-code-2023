@@ -6,6 +6,8 @@ val fs2Version = "3.10.0"
 
 val catsParseVersion = "1.0.0"
 
+val drosteVersion = "0.9.0"
+
 val munitVersion = "0.7.29"
 
 val disciplineMunitVersion = "1.0.9"
@@ -23,6 +25,7 @@ lazy val root = project
       "org.typelevel" %% "kittens" % kittensVersion,
       "co.fs2" %% "fs2-core" % fs2Version,
       "org.typelevel" %% "cats-parse" % catsParseVersion,
+      "io.higherkindness" %% "droste-core" % drosteVersion,
       "org.typelevel" %% "cats-laws" % catsVersion % Test,
       "org.scalameta" %% "munit" % munitVersion % Test,
       "org.scalameta" %% "munit-scalacheck" % munitVersion % Test,
