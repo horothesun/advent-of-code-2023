@@ -10,7 +10,7 @@ class Day4Suite extends ScalaCheckSuite:
   }
 
   property("consecutiveDeduped(n_times_c, toDedupe = c).length == 1") {
-    forAll(Gen.chooseNum(1, 100), Gen.alphaChar) { case (n, c) =>
+    forAll(Gen.chooseNum(1, 100), Gen.alphaChar) { (n, c) =>
       assertEquals(consecutiveDeduped(List.fill(n)(c), toDedupe = c).length, 1)
     }
   }
@@ -22,7 +22,7 @@ class Day4Suite extends ScalaCheckSuite:
       Gen.chooseNum(1, 100),
       Gen.numChar,
       Gen.alphaChar
-    ) { case (n, x, m, num, c) =>
+    ) { (n, x, m, num, c) =>
       val chars = List.fill(n)(num) ++ List.fill(x)(c) ++ List.fill(m)(num)
       assertEquals(consecutiveDeduped(chars, toDedupe = c).length, n + 1 + m)
     }

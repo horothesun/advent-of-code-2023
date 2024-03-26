@@ -155,7 +155,7 @@ def getMinLocation(seeds: List[Seed], cms: CategoryMappings): Option[Location] =
   seeds.map(seedToLocation).minOption
 
 def getMinLocation(inputs: List[String]): Option[Location] =
-  parseInputs(inputs).flatMap { case (ls, cms) => getMinLocation(seeds = ls.map(Seed.apply), cms) }
+  parseInputs(inputs).flatMap((ls, cms) => getMinLocation(seeds = ls.map(Seed.apply), cms))
 
 //def getExtendedSeeds(ns: List[Long]): Option[List[Seed]] =
 //  @tailrec
@@ -170,7 +170,7 @@ def getMinLocation(inputs: List[String]): Option[Location] =
 //  aux(ns, Some(List.empty))
 
 def getMinLocationWithExtendedSeeds(inputs: List[String]): Option[Location] =
-  parseInputs(inputs).flatMap { case (ns, cms) =>
+  parseInputs(inputs).flatMap { (ns, cms) =>
     getExtendedSeeds(ns).flatMap { seeds =>
       val seedToLocation = CompleteCategoryMappings.from(cms).seedToLocation
       seeds

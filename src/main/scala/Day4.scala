@@ -9,7 +9,7 @@ object CardId:
 def whitespaceMerged(s: String): String = consecutiveDeduped(s.toList, toDedupe = ' ').mkString
 
 def consecutiveDeduped[A](as: List[A], toDedupe: A): List[A] =
-  as.foldLeft(List.empty[A]) { case (acc, a) =>
+  as.foldLeft(List.empty[A]) { (acc, a) =>
     acc match
       case Nil                               => List(a)
       case h :: _ if h == toDedupe && h == a => acc
@@ -40,7 +40,7 @@ def getPoints(matches: List[Int]): Long = matches match
 
 def intPow(b: Int, e: Int): Long = if (e <= 0) 1 else if (e == 1) b else b * intPow(b, e - 1)
 
-def getTotalPoints(cards: List[Card]): Long = cards.map(c => getPoints(c.getMatches)).fold(0L)(_ + _)
+def getTotalPoints(cards: List[Card]): Long = cards.map(c => getPoints(c.getMatches)).sum
 
 def getTotalPoints(input: List[String]): Option[Long] = getCards(input).map(getTotalPoints)
 
@@ -50,11 +50,11 @@ def getNewCardIds(c: Card): List[CardId] =
 
 def getTotalCardInstances(cards: List[Card]): Map[CardId, Int] =
   val initial = cards.map(c => (c.id, 1)).toMap
-  cards.foldLeft(initial) { case (countByCardId, c) =>
+  cards.foldLeft(initial) { (countByCardId, c) =>
     val numbOfCs = countByCardId.getOrElse(c.id, 0)
-    getNewCardIds(c).foldLeft(countByCardId) { case (nById, id) => nById.updatedWith(id)(_.map(numbOfCs + _)) }
+    getNewCardIds(c).foldLeft(countByCardId)((nById, id) => nById.updatedWith(id)(_.map(numbOfCs + _)))
   }
 
-def getTotalCards(cards: List[Card]): Int = getTotalCardInstances(cards).toList.map { case (_, n) => n }.sum
+def getTotalCards(cards: List[Card]): Int = getTotalCardInstances(cards).toList.map((_, n) => n).sum
 
 def getTotalCards(input: List[String]): Option[Int] = getCards(input).map(getTotalCards)
