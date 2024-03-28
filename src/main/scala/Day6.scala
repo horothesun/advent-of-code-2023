@@ -8,9 +8,11 @@ case class Time(millis: Long):
 
 object Time:
   given Numeric[Time] = Numeric[Long].imap(Time.apply)(_.millis)
+  def zero: Time = Time(0)
 
 case class Distance(millimeters: Long)
 object Distance:
+  given Numeric[Distance] = Numeric[Long].imap(Distance.apply)(_.millimeters)
   given Ordering[Distance] = Ordering.by(_.millimeters)
 
 case class Race(allowance: Time, record: Distance)
@@ -32,7 +34,7 @@ def countWaysToWin_bruteForce(race: Race): Long = getAllPossibleDistances(race.a
 def getMultipliedWaysToWin_bruteForce(rs: List[Race]): Long = rs.map(countWaysToWin_bruteForce).product
 
 def countWaysToLoseLeft(race: Race): Long = countWaysToLose(
-  startHold = Numeric[Time].zero,
+  startHold = Time.zero,
   isHoldInBounds = _ <= race.allowance,
   nextHold = _.inc,
   race
@@ -40,7 +42,7 @@ def countWaysToLoseLeft(race: Race): Long = countWaysToLose(
 
 def countWaysToLoseRight(race: Race): Long = countWaysToLose(
   startHold = race.allowance,
-  isHoldInBounds = _ >= Numeric[Time].zero,
+  isHoldInBounds = _ >= Time.zero,
   nextHold = _.dec,
   race
 )
@@ -60,3 +62,73 @@ def countWaysToWin(race: Race): Long =
   val lossesFromLeft = countWaysToLoseLeft(race)
   val allLosses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(race))
   totalOutcomes - allLosses
+
+// droste 🧪🔬
+
+import higherkindness.droste.*
+import higherkindness.droste.data.*
+import higherkindness.droste.data.list.*
+
+enum RaceOutcome:
+  case Win
+  case Loss(travelled: Distance)
+
+import RaceOutcome.*
+
+enum HoldBounds:
+  case Within, Outside
+
+import HoldBounds.*
+
+def getRaceOutcome(race: Race, hold: Time): RaceOutcome =
+  val travelled = getTravelledDistance(race.allowance, hold)
+  if (travelled > race.record) Win else Loss(travelled)
+
+//case class StreamF[A, B](a: A, b: B)
+//type StreamF_[A] = [B] =>> StreamF[A, B]
+
+//import cats.data.NonEmptyList
+//def raceOutcomeCoAlg(r: Race): Coalgebra[[B] =>> StreamF[RaceOutcome, B], NonEmptyList[Time]] = Coalgebra {
+//  case nel @ NonEmptyList(hold, _) => StreamF(getRaceOutcome(r, hold), hold.inc :: nel)
+//}
+
+//def raceOutcomeStreamCoAlg(r: Race): Coalgebra[StreamF_[RaceOutcome], Time] =
+//  Coalgebra(hold => StreamF(getRaceOutcome(r, hold), hold.inc))
+
+type ListF_[A] = [B] =>> ListF[A, B]
+
+//def consF[A, B](head: A, tail: B): ListF[A, B] = ConsF(head, tail)
+//def nilF[A, B]: ListF[A, B] = NilF
+
+def losingDistancesCoAlg(
+  holdBounds: Time => HoldBounds,
+  nextHold: Time => Time,
+  race: Race
+): Coalgebra[ListF_[Distance], Time] = Coalgebra { hold =>
+  holdBounds(hold) match
+    case Within =>
+      getRaceOutcome(race, hold) match
+        case Win     => NilF
+        case Loss(d) => ConsF(d, nextHold(hold))
+    case Outside => NilF
+}
+
+def losingDistancesLeftCoAlg(race: Race): Coalgebra[ListF_[Distance], Time] =
+  losingDistancesCoAlg(
+    holdBounds = hold => if (hold <= race.allowance) Within else Outside,
+    nextHold = _.inc,
+    race
+  )
+
+def losingDistancesRightCoAlg(race: Race): Coalgebra[ListF_[Distance], Time] =
+  losingDistancesCoAlg(
+    holdBounds = hold => if (hold >= Time.zero) Within else Outside,
+    nextHold = _.dec,
+    race
+  )
+
+def getLosingDistancesLeft(race: Race): List[Distance] =
+  scheme.ana(losingDistancesLeftCoAlg(race)).apply(Time.zero)
+
+def getLosingDistancesRight(race: Race): List[Distance] =
+  scheme.ana(losingDistancesRightCoAlg(race)).apply(race.allowance)
