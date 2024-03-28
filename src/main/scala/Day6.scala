@@ -75,60 +75,55 @@ enum RaceOutcome:
 
 import RaceOutcome.*
 
-enum HoldBounds:
+enum Bounds:
   case Within, Outside
-
-import HoldBounds.*
 
 def getRaceOutcome(race: Race, hold: Time): RaceOutcome =
   val travelled = getTravelledDistance(race.allowance, hold)
   if (travelled > race.record) Win else Loss(travelled)
 
 //case class StreamF[A, B](a: A, b: B)
-//type StreamF_[A] = [B] =>> StreamF[A, B]
+//type StreamFAlg[A] = [B] =>> StreamF[A, B]
 
 //import cats.data.NonEmptyList
 //def raceOutcomeCoAlg(r: Race): Coalgebra[[B] =>> StreamF[RaceOutcome, B], NonEmptyList[Time]] = Coalgebra {
 //  case nel @ NonEmptyList(hold, _) => StreamF(getRaceOutcome(r, hold), hold.inc :: nel)
 //}
 
-//def raceOutcomeStreamCoAlg(r: Race): Coalgebra[StreamF_[RaceOutcome], Time] =
+//def raceOutcomeStreamCoAlg(r: Race): Coalgebra[StreamFAlg[RaceOutcome], Time] =
 //  Coalgebra(hold => StreamF(getRaceOutcome(r, hold), hold.inc))
 
-type ListF_[A] = [B] =>> ListF[A, B]
-
-//def consF[A, B](head: A, tail: B): ListF[A, B] = ConsF(head, tail)
-//def nilF[A, B]: ListF[A, B] = NilF
+type ListFAlg[A] = [B] =>> ListF[A, B]
 
 def losingDistancesCoAlg(
-  holdBounds: Time => HoldBounds,
+  holdBounds: Time => Bounds,
   nextHold: Time => Time,
   race: Race
-): Coalgebra[ListF_[Distance], Time] = Coalgebra { hold =>
+): Coalgebra[ListFAlg[Distance], Time] = Coalgebra { hold =>
   holdBounds(hold) match
-    case Within =>
+    case Bounds.Outside => NilF
+    case Bounds.Within =>
       getRaceOutcome(race, hold) match
         case Win     => NilF
         case Loss(d) => ConsF(d, nextHold(hold))
-    case Outside => NilF
 }
 
-def losingDistancesLeftCoAlg(race: Race): Coalgebra[ListF_[Distance], Time] =
+def losingDistancesLeftCoAlg(race: Race): Coalgebra[ListFAlg[Distance], Time] =
   losingDistancesCoAlg(
-    holdBounds = hold => if (hold <= race.allowance) Within else Outside,
+    holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
     nextHold = _.inc,
     race
   )
 
-def losingDistancesRightCoAlg(race: Race): Coalgebra[ListF_[Distance], Time] =
+def losingDistancesRightCoAlg(race: Race): Coalgebra[ListFAlg[Distance], Time] =
   losingDistancesCoAlg(
-    holdBounds = hold => if (hold >= Time.zero) Within else Outside,
+    holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
     nextHold = _.dec,
     race
   )
 
-def getLosingDistancesLeft(race: Race): List[Distance] =
-  scheme.ana(losingDistancesLeftCoAlg(race)).apply(Time.zero)
+//def getLosingDistancesLeft(race: Race): List[Distance] =
+//  scheme.ana(losingDistancesLeftCoAlg(race)).apply(Time.zero)
 
-def getLosingDistancesRight(race: Race): List[Distance] =
-  scheme.ana(losingDistancesRightCoAlg(race)).apply(race.allowance)
+//def getLosingDistancesRight(race: Race): List[Distance] =
+//  scheme.ana(losingDistancesRightCoAlg(race)).apply(race.allowance)
