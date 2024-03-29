@@ -17,6 +17,19 @@ object Distance:
 
 case class Race(allowance: Time, record: Distance)
 
+enum RaceOutcome:
+  case Win
+  case Loss(travelled: Distance)
+
+import RaceOutcome.*
+
+enum Bounds:
+  case Within, Outside
+
+def getRaceOutcome(race: Race, hold: Time): RaceOutcome =
+  val travelled = getTravelledDistance(race.allowance, hold)
+  if (travelled > race.record) Win else Loss(travelled)
+
 def getTravelledDistance(allowance: Time, hold: Time): Distance =
   val raceDuration = allowance - hold
   val speed = hold.millis
@@ -33,27 +46,31 @@ def countWaysToWin_bruteForce(race: Race): Long = getAllPossibleDistances(race.a
 
 def getMultipliedWaysToWin_bruteForce(rs: List[Race]): Long = rs.map(countWaysToWin_bruteForce).product
 
-def countWaysToLoseLeft(race: Race): Long = countWaysToLose(
-  startHold = Time.zero,
-  isHoldInBounds = _ <= race.allowance,
-  nextHold = _.inc,
-  race
-)
+def countWaysToLoseLeft(race: Race): Long =
+  countWaysToLose(
+    startHold = Time.zero,
+    holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
+    nextHold = _.inc,
+    race
+  )
 
-def countWaysToLoseRight(race: Race): Long = countWaysToLose(
-  startHold = race.allowance,
-  isHoldInBounds = _ >= Time.zero,
-  nextHold = _.dec,
-  race
-)
+def countWaysToLoseRight(race: Race): Long =
+  countWaysToLose(
+    startHold = race.allowance,
+    holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
+    nextHold = _.dec,
+    race
+  )
 
-def countWaysToLose(startHold: Time, isHoldInBounds: Time => Boolean, nextHold: Time => Time, race: Race): Long =
+def countWaysToLose(startHold: Time, holdBounds: Time => Bounds, nextHold: Time => Time, race: Race): Long =
   List
     .unfold[Distance, Time](startHold) { hold =>
-      if (isHoldInBounds(hold))
-        val travelled = getTravelledDistance(race.allowance, hold)
-        if (race.record >= travelled) Some((travelled, nextHold(hold))) else None
-      else None
+      holdBounds(hold) match
+        case Bounds.Outside => None
+        case Bounds.Within =>
+          getRaceOutcome(race, hold) match
+            case Win             => None
+            case Loss(travelled) => Some((travelled, nextHold(hold)))
     }
     .length
 
@@ -63,35 +80,12 @@ def countWaysToWin(race: Race): Long =
   val allLosses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(race))
   totalOutcomes - allLosses
 
-// droste 🧪🔬
+// recursion schemes 🧪🔬
 
+import cats.Eval
 import higherkindness.droste.*
 import higherkindness.droste.data.*
 import higherkindness.droste.data.list.*
-
-enum RaceOutcome:
-  case Win
-  case Loss(travelled: Distance)
-
-import RaceOutcome.*
-
-enum Bounds:
-  case Within, Outside
-
-def getRaceOutcome(race: Race, hold: Time): RaceOutcome =
-  val travelled = getTravelledDistance(race.allowance, hold)
-  if (travelled > race.record) Win else Loss(travelled)
-
-//case class StreamF[A, B](a: A, b: B)
-//type StreamFAlg[A] = [B] =>> StreamF[A, B]
-
-//import cats.data.NonEmptyList
-//def raceOutcomeCoAlg(r: Race): Coalgebra[[B] =>> StreamF[RaceOutcome, B], NonEmptyList[Time]] = Coalgebra {
-//  case nel @ NonEmptyList(hold, _) => StreamF(getRaceOutcome(r, hold), hold.inc :: nel)
-//}
-
-//def raceOutcomeStreamCoAlg(r: Race): Coalgebra[StreamFAlg[RaceOutcome], Time] =
-//  Coalgebra(hold => StreamF(getRaceOutcome(r, hold), hold.inc))
 
 type ListFAlg[A] = [B] =>> ListF[A, B]
 
@@ -122,8 +116,22 @@ def losingDistancesRightCoAlg(race: Race): Coalgebra[ListFAlg[Distance], Time] =
     race
   )
 
-//def getLosingDistancesLeft(race: Race): List[Distance] =
-//  scheme.ana(losingDistancesLeftCoAlg(race)).apply(Time.zero)
+def losingDistancesAlg: Algebra[ListFAlg[Distance], Long] = Algebra {
+  case ConsF(_, tailLength) => 1 + tailLength
+  case NilF                 => 0
+}
 
-//def getLosingDistancesRight(race: Race): List[Distance] =
-//  scheme.ana(losingDistancesRightCoAlg(race)).apply(race.allowance)
+def countWaysToLoseLeft_(race: Race): Long = scheme
+  .hyloM(
+    losingDistancesAlg.lift[Eval],
+    losingDistancesLeftCoAlg(race).lift[Eval]
+  )
+  .apply(Time.zero)
+  .value
+def countWaysToLoseRight_(race: Race): Long = scheme
+  .hyloM(
+    losingDistancesAlg.lift[Eval],
+    losingDistancesRightCoAlg(race).lift[Eval]
+  )
+  .apply(race.allowance)
+  .value
