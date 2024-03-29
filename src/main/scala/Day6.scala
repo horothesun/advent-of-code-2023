@@ -1,6 +1,7 @@
 import cats.implicits.*
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.math.Numeric.Implicits.infixNumericOps
+import RaceOutcome.*
 
 case class Time(millis: Long):
   def inc: Time = Time(millis + 1)
@@ -20,8 +21,6 @@ case class Race(allowance: Time, record: Distance)
 enum RaceOutcome:
   case Win
   case Loss(travelled: Distance)
-
-import RaceOutcome.*
 
 enum Bounds:
   case Within, Outside
