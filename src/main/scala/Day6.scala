@@ -81,6 +81,8 @@ def countWaysToWin(race: Race): Long =
 
 // recursion schemes 🧪🔬
 
+// export SBT_OPTS="-Xmx2G"
+
 import cats.Eval
 import higherkindness.droste.*
 import higherkindness.droste.data.*
@@ -97,8 +99,8 @@ def losingDistancesCoAlg(
     case Bounds.Outside => NilF
     case Bounds.Within =>
       getRaceOutcome(race, hold) match
-        case Win     => NilF
-        case Loss(d) => ConsF(d, nextHold(hold))
+        case Win             => NilF
+        case Loss(travelled) => ConsF(travelled, nextHold(hold))
 }
 
 def losingDistancesLeftCoAlg(race: Race): Coalgebra[ListFAlg[Distance], Time] =
