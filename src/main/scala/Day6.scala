@@ -81,58 +81,93 @@ def countWaysToWin(race: Race): Long =
 
 // recursion schemes 🧪🔬
 
-// export SBT_OPTS="-Xmx2G"
-
 import cats.Eval
 import higherkindness.droste.*
 import higherkindness.droste.data.*
 import higherkindness.droste.data.list.*
+import higherkindness.droste.scheme.*
 
-type ListFAlg[A] = [B] =>> ListF[A, B]
+object RecursionSchemesOption:
 
-def losingDistancesCoAlg(
-  holdBounds: Time => Bounds,
-  nextHold: Time => Time,
-  race: Race
-): Coalgebra[ListFAlg[Distance], Time] = Coalgebra { hold =>
-  holdBounds(hold) match
-    case Bounds.Outside => NilF
-    case Bounds.Within =>
-      getRaceOutcome(race, hold) match
-        case Win             => NilF
-        case Loss(travelled) => ConsF(travelled, nextHold(hold))
-}
+  type FAlgebra[A] = Algebra[Option, A]
+  type FCoalgebra[A] = Coalgebra[Option, A]
 
-def losingDistancesLeftCoAlg(race: Race): Coalgebra[ListFAlg[Distance], Time] =
-  losingDistancesCoAlg(
-    holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
-    nextHold = _.inc,
-    race
-  )
+  def losingDistancesCoAlg(
+    holdBounds: Time => Bounds,
+    nextHold: Time => Time,
+    race: Race
+  ): FCoalgebra[Time] = Coalgebra { hold =>
+    holdBounds(hold) match
+      case Bounds.Outside => None
+      case Bounds.Within =>
+        getRaceOutcome(race, hold) match
+          case Win     => None
+          case Loss(_) => Some(nextHold(hold))
+  }
 
-def losingDistancesRightCoAlg(race: Race): Coalgebra[ListFAlg[Distance], Time] =
-  losingDistancesCoAlg(
-    holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
-    nextHold = _.dec,
-    race
-  )
+  def losingDistancesLeftCoAlg(race: Race): FCoalgebra[Time] =
+    losingDistancesCoAlg(
+      holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
+      nextHold = _.inc,
+      race
+    )
 
-def losingDistancesAlg: Algebra[ListFAlg[Distance], Long] = Algebra {
-  case ConsF(_, tailLength) => 1 + tailLength
-  case NilF                 => 0
-}
+  def losingDistancesRightCoAlg(race: Race): FCoalgebra[Time] =
+    losingDistancesCoAlg(
+      holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
+      nextHold = _.dec,
+      race
+    )
 
-def countWaysToLoseLeft_(race: Race): Long = scheme
-  .hyloM(
-    losingDistancesAlg.lift[Eval],
-    losingDistancesLeftCoAlg(race).lift[Eval]
-  )
-  .apply(Time.zero)
-  .value
-def countWaysToLoseRight_(race: Race): Long = scheme
-  .hyloM(
-    losingDistancesAlg.lift[Eval],
-    losingDistancesRightCoAlg(race).lift[Eval]
-  )
-  .apply(race.allowance)
-  .value
+  def countAlg: FAlgebra[Long] = Algebra {
+    case Some(count) => 1 + count
+    case None        => 0
+  }
+
+  def countWaysToLoseLeft(race: Race): Long =
+    hyloM(countAlg.lift[Eval], losingDistancesLeftCoAlg(race).lift[Eval]).apply(Time.zero).value
+  def countWaysToLoseRight(race: Race): Long =
+    hyloM(countAlg.lift[Eval], losingDistancesRightCoAlg(race).lift[Eval]).apply(race.allowance).value
+
+// export SBT_OPTS="-Xmx2G"
+object RecursionSchemesListF:
+
+  type FAlgebra[A, B] = Algebra[[T] =>> ListF[A, T], B]
+  type FCoalgebra[A, B] = Coalgebra[[T] =>> ListF[A, T], B]
+
+  def losingDistancesCoAlg(
+    holdBounds: Time => Bounds,
+    nextHold: Time => Time,
+    race: Race
+  ): FCoalgebra[Distance, Time] = Coalgebra { hold =>
+    holdBounds(hold) match
+      case Bounds.Outside => NilF
+      case Bounds.Within =>
+        getRaceOutcome(race, hold) match
+          case Win             => NilF
+          case Loss(travelled) => ConsF(travelled, nextHold(hold))
+  }
+
+  def losingDistancesLeftCoAlg(race: Race): FCoalgebra[Distance, Time] =
+    losingDistancesCoAlg(
+      holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
+      nextHold = _.inc,
+      race
+    )
+
+  def losingDistancesRightCoAlg(race: Race): FCoalgebra[Distance, Time] =
+    losingDistancesCoAlg(
+      holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
+      nextHold = _.dec,
+      race
+    )
+
+  def losingDistancesAlg: FAlgebra[Distance, Long] = Algebra {
+    case ConsF(_, tailLength) => 1 + tailLength
+    case NilF                 => 0
+  }
+
+  def countWaysToLoseLeft(race: Race): Long =
+    hyloM(losingDistancesAlg.lift[Eval], losingDistancesLeftCoAlg(race).lift[Eval]).apply(Time.zero).value
+  def countWaysToLoseRight(race: Race): Long =
+    hyloM(losingDistancesAlg.lift[Eval], losingDistancesRightCoAlg(race).lift[Eval]).apply(race.allowance).value
