@@ -102,6 +102,10 @@ class Day7Suite extends ScalaCheckSuite:
     assertEquals(getTotalWinnings(bigInput), Some(Win(249_748_283)))
   }
 
+  // part 2
+
+  // TODO: ...
+
 object Day7Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day7_input.txt")

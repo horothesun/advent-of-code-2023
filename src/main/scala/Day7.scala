@@ -8,16 +8,6 @@ case class Strength(value: Int)
 object Strength:
   given Order[Strength] = Order.by(_.value)
 
-enum CardLabel:
-  case A, K, Q, J, T, `9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`
-
-  def strength: Strength = Strength(CardLabel.values.length - ordinal)
-
-object CardLabel:
-  given Order[CardLabel] = Order.by(_.strength)
-
-  def parse(c: Char): Option[CardLabel] = Try(CardLabel.valueOf(s"$c")).toOption
-
 enum HandType:
   case FiveOfAKind, FourOfAKind, FullHouse, ThreeOfAKind, TwoPairs, OnePair, HighCard
 
@@ -28,6 +18,7 @@ object HandType:
 
 trait Comparator[A]:
   def compare: (A, A) => Int
+  def toOrder: Order[A] = Order.from(compare)
 
 object Comparator:
   given SemigroupK[Comparator] = new SemigroupK[Comparator]:
@@ -35,6 +26,16 @@ object Comparator:
       override def compare: (A, A) => Int = (al, ar) =>
         val xCmp = x.compare(al, ar)
         if (xCmp == 0) y.compare(al, ar) else xCmp
+
+enum CardLabel:
+  case A, K, Q, J, T, `9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`
+
+  def strength: Strength = Strength(CardLabel.values.length - ordinal)
+
+object CardLabel:
+  given Order[CardLabel] = Order.by(_.strength)
+
+  def parse(c: Char): Option[CardLabel] = Try(CardLabel.valueOf(s"$c")).toOption
 
 case class Hand(c1: CardLabel, c2: CardLabel, c3: CardLabel, c4: CardLabel, c5: CardLabel):
   lazy val handType: HandType =
@@ -60,12 +61,11 @@ object Hand:
 
   given Semigroup[Comparator[Hand]] = SemigroupK[Comparator].algebra
 
-  given Order[Hand] = Order.from((hl, hr) =>
+  given Order[Hand] =
     NonEmptyList(
       handTypeComparator,
       List[Hand => CardLabel](_.c1, _.c2, _.c3, _.c4, _.c5).map(nthCardComparator)
-    ).reduce.compare(hl, hr)
-  )
+    ).reduce.toOrder
 
   def parse(s: String): Option[Hand] =
     s.toList.traverse(CardLabel.parse).collect { case c1 :: c2 :: c3 :: c4 :: c5 :: Nil => Hand(c1, c2, c3, c4, c5) }
@@ -92,3 +92,52 @@ def withRanks(hbs: List[(Hand, Bid)]): List[(Hand, Bid, Rank)] =
 def getTotalWinnings(hbs: List[(Hand, Bid)]): Win = withRanks(hbs).map((_, b, r) => Win(b.value * r.value)).sum
 
 def getTotalWinnings(inputs: List[String]): Option[Win] = parseAllHandsAndBids(inputs).map(getTotalWinnings)
+
+// part 2
+
+enum CardLabelJ:
+  case A, K, Q, T, `9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, J
+
+  def strength: Strength = Strength(CardLabel.values.length - ordinal)
+
+object CardLabelJ:
+  given Order[CardLabelJ] = Order.by(_.strength)
+
+  def parse(c: Char): Option[CardLabelJ] = Try(CardLabelJ.valueOf(s"$c")).toOption
+
+case class HandJ(c1: CardLabelJ, c2: CardLabelJ, c3: CardLabelJ, c4: CardLabelJ, c5: CardLabelJ):
+  lazy val handType: HandType = ???
+
+object HandJ:
+  val handTypeComparator: Comparator[HandJ] = new Comparator[HandJ]:
+    override def compare: (HandJ, HandJ) => Int = (hl, hr) =>
+      if (hl.handType < hr.handType) -1 else if (hl.handType == hr.handType) 0 else 1
+  def nthCardComparator(nth: HandJ => CardLabelJ): Comparator[HandJ] = new Comparator[HandJ]:
+    override def compare: (HandJ, HandJ) => Int = (hl, hr) =>
+      val nl = nth(hl)
+      val nr = nth(hr)
+      if (nl < nr) -1 else if (nl == nr) 0 else 1
+
+  given Semigroup[Comparator[HandJ]] = SemigroupK[Comparator].algebra
+
+  given Order[HandJ] =
+    NonEmptyList(
+      handTypeComparator,
+      List[HandJ => CardLabelJ](_.c1, _.c2, _.c3, _.c4, _.c5).map(nthCardComparator)
+    ).reduce.toOrder
+
+  def parse(s: String): Option[HandJ] =
+    s.toList.traverse(CardLabelJ.parse).collect { case c1 :: c2 :: c3 :: c4 :: c5 :: Nil => HandJ(c1, c2, c3, c4, c5) }
+
+def parseHandJAndBid(s: String): Option[(HandJ, Bid)] = s.split(' ') match
+  case Array(h, b) => (HandJ.parse(h), Bid.parse(b)).tupled
+  case _           => None
+
+def parseAllHandJsAndBids(inputs: List[String]): Option[List[(HandJ, Bid)]] = inputs.traverse(parseHandJAndBid)
+
+def withRanksJ(hbs: List[(HandJ, Bid)]): List[(HandJ, Bid, Rank)] =
+  hbs.sortBy((h, _) => h).zipWithIndex.map { case ((h, b), i) => (h, b, Rank(1 + i)) }
+
+def getTotalWinningsJ(hbs: List[(HandJ, Bid)]): Win = withRanksJ(hbs).map((_, b, r) => Win(b.value * r.value)).sum
+
+def getTotalWinningsJ(inputs: List[String]): Option[Win] = parseAllHandJsAndBids(inputs).map(getTotalWinningsJ)
