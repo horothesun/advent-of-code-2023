@@ -1,5 +1,6 @@
 import munit.ScalaCheckSuite
-import CompleteCategoryMappings.*
+import Day5.*
+import Day5.CompleteCategoryMappings.*
 import Day5Suite.*
 
 class Day5Suite extends ScalaCheckSuite:
