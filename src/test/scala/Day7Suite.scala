@@ -6,6 +6,8 @@ import HandType.*
 
 class Day7Suite extends ScalaCheckSuite:
 
+  // part 1
+
   test("`A` card label has maximum strength") {
     assertEquals(CardLabel.values.max, A)
   }
@@ -88,13 +90,6 @@ class Day7Suite extends ScalaCheckSuite:
   }
 
   test("small input total winnings are 6_440") {
-    val smallInput = List(
-      "32T3K 765",
-      "T55J5 684",
-      "KK677 28",
-      "KTJJT 220",
-      "QQQJA 483"
-    )
     assertEquals(getTotalWinnings(smallInput), Some(Win(6_440)))
   }
 
@@ -104,8 +99,47 @@ class Day7Suite extends ScalaCheckSuite:
 
   // part 2
 
-  // TODO: ...
+  test("32T3K hand is one-pair (new J rule)") {
+    import CardLabelJ.*
+    assertEquals(HandJ(`3`, `2`, T, `3`, K).handType, OnePair)
+  }
+
+  test("T55J5 hand is four-of-a-kind (new J rule)") {
+    import CardLabelJ.*
+    assertEquals(HandJ(T, `5`, `5`, J, `5`).handType, FourOfAKind)
+  }
+
+  test("KK677 hand is two-pairs (new J rule)") {
+    import CardLabelJ.*
+    assertEquals(HandJ(K, K, `6`, `7`, `7`).handType, TwoPairs)
+  }
+
+  test("KTJJT hand is four-of-a-kind (new J rule)") {
+    import CardLabelJ.*
+    assertEquals(HandJ(K, T, J, J, T).handType, FourOfAKind)
+  }
+
+  test("QQQJA hand is four-of-a-kind (new J rule)") {
+    import CardLabelJ.*
+    assertEquals(HandJ(Q, Q, Q, J, A).handType, FourOfAKind)
+  }
+
+  test("small input total winnings are 5_905 (new J rule)") {
+    assertEquals(getTotalWinningsJ(smallInput), Some(Win(5_905)))
+  }
+
+  test("big input total winnings are 248_029_057 (new J rule)") {
+    assertEquals(getTotalWinningsJ(bigInput), Some(Win(248_029_057)))
+  }
 
 object Day7Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day7_input.txt")
+
+  val smallInput: List[String] = List(
+    "32T3K 765",
+    "T55J5 684",
+    "KK677 28",
+    "KTJJT 220",
+    "QQQJA 483"
+  )

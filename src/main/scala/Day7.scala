@@ -100,13 +100,52 @@ enum CardLabelJ:
 
   def strength: Strength = Strength(CardLabel.values.length - ordinal)
 
+  def toCardLabel: CardLabel = this match
+    case CardLabelJ.A   => CardLabel.A
+    case CardLabelJ.K   => CardLabel.K
+    case CardLabelJ.Q   => CardLabel.Q
+    case CardLabelJ.T   => CardLabel.T
+    case CardLabelJ.`9` => CardLabel.`9`
+    case CardLabelJ.`8` => CardLabel.`8`
+    case CardLabelJ.`7` => CardLabel.`7`
+    case CardLabelJ.`6` => CardLabel.`6`
+    case CardLabelJ.`5` => CardLabel.`5`
+    case CardLabelJ.`4` => CardLabel.`4`
+    case CardLabelJ.`3` => CardLabel.`3`
+    case CardLabelJ.`2` => CardLabel.`2`
+    case CardLabelJ.J   => CardLabel.J
+
 object CardLabelJ:
   given Order[CardLabelJ] = Order.by(_.strength)
 
-  def parse(c: Char): Option[CardLabelJ] = Try(CardLabelJ.valueOf(s"$c")).toOption
+  def from(c: CardLabel): CardLabelJ = c match
+    case CardLabel.A   => CardLabelJ.A
+    case CardLabel.K   => CardLabelJ.K
+    case CardLabel.Q   => CardLabelJ.Q
+    case CardLabel.J   => CardLabelJ.J
+    case CardLabel.T   => CardLabelJ.T
+    case CardLabel.`9` => CardLabelJ.`9`
+    case CardLabel.`8` => CardLabelJ.`8`
+    case CardLabel.`7` => CardLabelJ.`7`
+    case CardLabel.`6` => CardLabelJ.`6`
+    case CardLabel.`5` => CardLabelJ.`5`
+    case CardLabel.`4` => CardLabelJ.`4`
+    case CardLabel.`3` => CardLabelJ.`3`
+    case CardLabel.`2` => CardLabelJ.`2`
 
 case class HandJ(c1: CardLabelJ, c2: CardLabelJ, c3: CardLabelJ, c4: CardLabelJ, c5: CardLabelJ):
-  lazy val handType: HandType = ???
+  lazy val handType: HandType =
+    if (containsJ)
+      CardLabelJ.values.toList.map(c => replaceJs(c).toHand.handType).toNel.fold(ifEmpty = HighCard)(_.maximum)
+    else toHand.handType
+
+  def containsJ: Boolean = List(c1, c2, c3, c4, c5).contains(CardLabelJ.J)
+
+  def replaceJs(newC: CardLabelJ): HandJ =
+    val j2NewC: CardLabelJ => CardLabelJ = c => if (c == CardLabelJ.J) newC else c
+    HandJ(j2NewC(c1), j2NewC(c2), j2NewC(c3), j2NewC(c4), j2NewC(c5))
+
+  def toHand: Hand = Hand(c1.toCardLabel, c2.toCardLabel, c3.toCardLabel, c4.toCardLabel, c5.toCardLabel)
 
 object HandJ:
   val handTypeComparator: Comparator[HandJ] = new Comparator[HandJ]:
@@ -126,8 +165,15 @@ object HandJ:
       List[HandJ => CardLabelJ](_.c1, _.c2, _.c3, _.c4, _.c5).map(nthCardComparator)
     ).reduce.toOrder
 
-  def parse(s: String): Option[HandJ] =
-    s.toList.traverse(CardLabelJ.parse).collect { case c1 :: c2 :: c3 :: c4 :: c5 :: Nil => HandJ(c1, c2, c3, c4, c5) }
+  def parse(s: String): Option[HandJ] = Hand.parse(s).map(from)
+
+  def from(h: Hand): HandJ = HandJ(
+    CardLabelJ.from(h.c1),
+    CardLabelJ.from(h.c2),
+    CardLabelJ.from(h.c3),
+    CardLabelJ.from(h.c4),
+    CardLabelJ.from(h.c5)
+  )
 
 def parseHandJAndBid(s: String): Option[(HandJ, Bid)] = s.split(' ') match
   case Array(h, b) => (HandJ.parse(h), Bid.parse(b)).tupled
