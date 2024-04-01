@@ -1,8 +1,9 @@
 import cats.implicits.*
 import munit.ScalaCheckSuite
-import CardLabel.*
+import Day7.*
+import Day7.CardLabel.*
+import Day7.HandType.*
 import Day7Suite.*
-import HandType.*
 
 class Day7Suite extends ScalaCheckSuite:
 
@@ -81,11 +82,11 @@ class Day7Suite extends ScalaCheckSuite:
   }
 
   test("parse \"32T3K 765\" input line") {
-    assertEquals(parseHandAndBid("32T3K 765"), Some(Hand(`3`, `2`, T, `3`, K), Bid(765)))
+    assertEquals(Day7.parse("32T3K 765"), Some(Hand(`3`, `2`, T, `3`, K), Bid(765)))
   }
 
   test("big input hands are all distinct") {
-    val distinctHandsCount = parseAllHandsAndBids(bigInput).map(_.groupBy((h, _) => h).keys.size)
+    val distinctHandsCount = Day7.parse(bigInput).map(_.groupBy((h, _) => h).keys.size)
     assertEquals(distinctHandsCount, Some(bigInput.length))
   }
 
