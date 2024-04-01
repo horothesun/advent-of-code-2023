@@ -1,6 +1,7 @@
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
+import Day4.*
 import Day4Suite.*
 
 class Day4Suite extends ScalaCheckSuite:
