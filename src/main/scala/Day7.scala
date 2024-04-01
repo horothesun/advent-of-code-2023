@@ -6,14 +6,12 @@ import Day7.HandType.*
 
 object Day7:
 
-  case class Strength(value: Int)
-  object Strength:
-    given Order[Strength] = Order.by(_.value)
+  opaque type Strength = Int
 
   enum HandType:
     case FiveOfAKind, FourOfAKind, FullHouse, ThreeOfAKind, TwoPairs, OnePair, HighCard
 
-    def strength: Strength = Strength(HandType.values.length - ordinal)
+    def strength: Strength = HandType.values.length - ordinal
 
   object HandType:
     given Order[HandType] = Order.by(_.strength)
@@ -32,7 +30,7 @@ object Day7:
   enum CardLabel:
     case A, K, Q, J, T, `9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`
 
-    def strength: Strength = Strength(CardLabel.values.length - ordinal)
+    def strength: Strength = CardLabel.values.length - ordinal
 
   object CardLabel:
     given Order[CardLabel] = Order.by(_.strength)
@@ -72,15 +70,19 @@ object Day7:
     def parse(s: String): Option[Hand] =
       s.toList.traverse(CardLabel.parse).collect { case c1 :: c2 :: c3 :: c4 :: c5 :: Nil => Hand(c1, c2, c3, c4, c5) }
 
-  case class Bid(value: Int)
+  opaque type Bid = Int
   object Bid:
-    def parse(s: String): Option[Bid] = s.toIntOption.map(Bid.apply)
+    def apply(i: Int): Bid = i
+    def parse(s: String): Option[Bid] = s.toIntOption
 
-  case class Rank(value: Int)
+  opaque type Rank = Int
+  object Rank:
+    def apply(i: Int): Rank = i
 
-  case class Win(value: Long)
+  opaque type Win = Long
   object Win:
-    given Numeric[Win] = Numeric[Long].imap(Win.apply)(_.value)
+    def apply(l: Long): Win = l
+    def from(b: Bid, r: Rank): Win = b * r
 
   def parse(input: String): Option[(Hand, Bid)] = input.split(' ') match
     case Array(h, b) => (Hand.parse(h), Bid.parse(b)).tupled
@@ -91,7 +93,7 @@ object Day7:
   def withRanks(hbs: List[(Hand, Bid)]): List[(Hand, Bid, Rank)] =
     hbs.sortBy((h, _) => h).zipWithIndex.map { case ((h, b), i) => (h, b, Rank(1 + i)) }
 
-  def getTotalWinnings(hbs: List[(Hand, Bid)]): Win = withRanks(hbs).map((_, b, r) => Win(b.value * r.value)).sum
+  def getTotalWinnings(hbs: List[(Hand, Bid)]): Win = withRanks(hbs).map((_, b, r) => Win.from(b, r)).sum
 
   def getTotalWinnings(inputs: List[String]): Option[Win] = parse(inputs).map(getTotalWinnings)
 
@@ -100,7 +102,7 @@ object Day7:
   enum CardLabelJ:
     case A, K, Q, T, `9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`, J
 
-    def strength: Strength = Strength(CardLabel.values.length - ordinal)
+    def strength: Strength = CardLabel.values.length - ordinal
 
     def toCardLabel: CardLabel = this match
       case CardLabelJ.A   => CardLabel.A
@@ -186,6 +188,6 @@ object Day7:
   def withRanksJ(hbs: List[(HandJ, Bid)]): List[(HandJ, Bid, Rank)] =
     hbs.sortBy((h, _) => h).zipWithIndex.map { case ((h, b), i) => (h, b, Rank(1 + i)) }
 
-  def getTotalWinningsJ(hbs: List[(HandJ, Bid)]): Win = withRanksJ(hbs).map((_, b, r) => Win(b.value * r.value)).sum
+  def getTotalWinningsJ(hbs: List[(HandJ, Bid)]): Win = withRanksJ(hbs).map((_, b, r) => Win.from(b, r)).sum
 
   def getTotalWinningsJ(inputs: List[String]): Option[Win] = parseJ(inputs).map(getTotalWinningsJ)
