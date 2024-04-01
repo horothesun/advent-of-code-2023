@@ -15,8 +15,8 @@ object Day8:
   opaque type NodeId = String
   object NodeId:
     def apply(s: String): NodeId = s
-    val source: NodeId = "AAA"
-    val destination: NodeId = "ZZZ"
+    val start: NodeId = "AAA"
+    val finish: NodeId = "ZZZ"
 
   case class Node(id: NodeId, left: NodeId, right: NodeId)
   object Node:
