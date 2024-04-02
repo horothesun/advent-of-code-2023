@@ -18,7 +18,11 @@ object Day8:
     val start: NodeId = "AAA"
     val finish: NodeId = "ZZZ"
 
-  case class Node(id: NodeId, left: NodeId, right: NodeId)
+  case class Node(id: NodeId, left: NodeId, right: NodeId):
+    def next(d: Direction): NodeId = d match
+      case L => left
+      case R => right
+
   object Node:
     def parse(s: String): Option[Node] = s.toList match
       case id1 :: id2 :: id3 :: ' ' :: '=' :: ' ' :: '(' :: l1 :: l2 :: l3 :: ',' :: ' ' :: r1 :: r2 :: r3 :: ')' :: Nil =>
@@ -41,17 +45,13 @@ object Day8:
   object StepsCount:
     def apply(l: Long): StepsCount = l
 
-  def next(from: Node, d: Direction): NodeId = d match
-    case L => from.left
-    case R => from.right
-
   def stepsCountToFinish(nd: NavigationDocument): Option[StepsCount] =
     val nodeById = nd.nodes.groupByNem(_.id).map(_.head)
     Stream
       .emits[Pure, Direction](nd.directions.toList)
       .repeat
       .scan[(NodeId, Option[StepsCount])]((NodeId.start, Some(0))) { case ((fromId, acc), d) =>
-        nodeById(fromId).fold(ifEmpty = (fromId, None))(from => (next(from, d), acc.map(1 + _)))
+        nodeById(fromId).fold(ifEmpty = (fromId, None))(from => (from.next(d), acc.map(1 + _)))
       }
       .collectFirst {
         case (_, None)          => None
