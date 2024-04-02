@@ -24,13 +24,13 @@ object Day8:
       case _ => None
 
   case class NavigationDocument(directions: NonEmptyList[Direction], nodes: NonEmptyList[Node])
-
-  def parseDirections(cs: NonEmptyList[Char]): Option[NonEmptyList[Direction]] = cs.traverse(Direction.parse)
-  def parseNodes(inputs: NonEmptyList[String]): Option[NonEmptyList[Node]] = inputs.traverse(Node.parse)
-  def parse(inputs: List[String]): Option[NavigationDocument] = inputs match
-    case ds :: "" :: ns =>
-      (
-        ds.toList.toNel.flatMap(parseDirections),
-        ns.toNel.flatMap(parseNodes)
-      ).mapN(NavigationDocument.apply)
-    case _ => None
+  object NavigationDocument:
+    def parseDirections(cs: NonEmptyList[Char]): Option[NonEmptyList[Direction]] = cs.traverse(Direction.parse)
+    def parseNodes(inputs: NonEmptyList[String]): Option[NonEmptyList[Node]] = inputs.traverse(Node.parse)
+    def parse(inputs: List[String]): Option[NavigationDocument] = inputs match
+      case ds :: "" :: ns =>
+        (
+          ds.toList.toNel.flatMap(parseDirections),
+          ns.toNel.flatMap(parseNodes)
+        ).mapN(NavigationDocument.apply)
+      case _ => None

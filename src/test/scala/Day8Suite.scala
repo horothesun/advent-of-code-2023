@@ -15,14 +15,14 @@ class Day8Suite extends ScalaCheckSuite:
 
   test("parse \"RLLRRL\" directions") {
     assertEquals(
-      parseDirections(NonEmptyList.of('R', 'L', 'L', 'R', 'R', 'L')),
+      NavigationDocument.parseDirections(NonEmptyList.of('R', 'L', 'L', 'R', 'R', 'L')),
       Some(NonEmptyList.of(R, L, L, R, R, L))
     )
   }
 
   test("parse small input 1") {
     assertEquals(
-      Day8.parse(smallInput1),
+      NavigationDocument.parse(smallInput1),
       Some(
         NavigationDocument(
           directions = NonEmptyList.of(R, L),
@@ -42,7 +42,7 @@ class Day8Suite extends ScalaCheckSuite:
 
   test("parse small input 2") {
     assertEquals(
-      Day8.parse(smallInput2),
+      NavigationDocument.parse(smallInput2),
       Some(
         NavigationDocument(
           directions = NonEmptyList.of(L, L, R),
