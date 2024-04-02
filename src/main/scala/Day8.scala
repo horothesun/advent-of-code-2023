@@ -1,6 +1,8 @@
 import cats.data.NonEmptyList
 import cats.implicits.*
+import fs2.{Pure, Stream}
 import scala.util.Try
+import Day8.Direction.*
 
 object Day8:
 
@@ -34,3 +36,30 @@ object Day8:
           ns.toNel.flatMap(parseNodes)
         ).mapN(NavigationDocument.apply)
       case _ => None
+
+  opaque type StepsCount = Long
+  object StepsCount:
+    def apply(l: Long): StepsCount = l
+
+  def next(from: Node, d: Direction): NodeId = d match
+    case L => from.left
+    case R => from.right
+
+  def stepsCountToFinish(nd: NavigationDocument): Option[StepsCount] =
+    val nodeById = nd.nodes.groupByNem(_.id).map(_.head)
+    Stream
+      .emits[Pure, Direction](nd.directions.toList)
+      .repeat
+      .scan[(NodeId, Option[StepsCount])]((NodeId.start, Some(0))) { case ((fromId, acc), d) =>
+        nodeById(fromId).fold(ifEmpty = (fromId, None))(from => (next(from, d), acc.map(1 + _)))
+      }
+      .collectFirst {
+        case (_, None)          => None
+        case (NodeId.finish, c) => c
+      }
+      .toList
+      .headOption
+      .flatten
+
+  def stepsCountToFinish(inputs: List[String]): Option[StepsCount] =
+    NavigationDocument.parse(inputs).flatMap(stepsCountToFinish)
