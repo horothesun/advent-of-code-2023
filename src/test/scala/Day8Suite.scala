@@ -6,10 +6,12 @@ import Day8Suite.*
 
 class Day8Suite extends ScalaCheckSuite:
 
+  // part 1
+
   test("parse \"AAA = (BBB, CCC)\" node") {
     assertEquals(
       Node.parse("AAA = (BBB, CCC)"),
-      Some(Node(id = NodeId("AAA"), left = NodeId("BBB"), right = NodeId("CCC")))
+      Some(Node(id = NodeId('A', 'A', 'A'), left = NodeId('B', 'B', 'B'), right = NodeId('C', 'C', 'C')))
     )
   }
 
@@ -40,6 +42,28 @@ class Day8Suite extends ScalaCheckSuite:
     assertEquals(stepsCountToFinish(bigInput), Some(StepsCount(17_263)))
   }
 
+  // part 2
+
+  test("third small input requires 6 steps to reach final node as a ghost") {
+    val smallInput3 = List(
+      "LR",
+      "",
+      "11A = (11B, XXX)",
+      "11B = (XXX, 11Z)",
+      "11Z = (11B, XXX)",
+      "22A = (22B, XXX)",
+      "22B = (22C, 22C)",
+      "22C = (22Z, 22Z)",
+      "22Z = (22B, 22B)",
+      "XXX = (XXX, XXX)"
+    )
+    assertEquals(stepsCountToFinishGhost(smallInput3), Some(StepsCount(6)))
+  }
+
+//  test("big input requires ??? steps to reach final node as ghost") {
+//    assertEquals(stepsCountToFinishGhost(bigInput), Some(StepsCount(???)))
+//  }
+
 object Day8Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day8_input.txt")
@@ -59,13 +83,13 @@ object Day8Suite:
   val smallNavigationDocument1: NavigationDocument = NavigationDocument(
     directions = NonEmptyList.of(R, L),
     nodes = NonEmptyList.of(
-      Node(id = NodeId("AAA"), left = NodeId("BBB"), right = NodeId("CCC")),
-      Node(id = NodeId("BBB"), left = NodeId("DDD"), right = NodeId("EEE")),
-      Node(id = NodeId("CCC"), left = NodeId("ZZZ"), right = NodeId("GGG")),
-      Node(id = NodeId("DDD"), left = NodeId("DDD"), right = NodeId("DDD")),
-      Node(id = NodeId("EEE"), left = NodeId("EEE"), right = NodeId("EEE")),
-      Node(id = NodeId("GGG"), left = NodeId("GGG"), right = NodeId("GGG")),
-      Node(id = NodeId("ZZZ"), left = NodeId("ZZZ"), right = NodeId("ZZZ"))
+      Node(id = NodeId('A', 'A', 'A'), left = NodeId('B', 'B', 'B'), right = NodeId('C', 'C', 'C')),
+      Node(id = NodeId('B', 'B', 'B'), left = NodeId('D', 'D', 'D'), right = NodeId('E', 'E', 'E')),
+      Node(id = NodeId('C', 'C', 'C'), left = NodeId('Z', 'Z', 'Z'), right = NodeId('G', 'G', 'G')),
+      Node(id = NodeId('D', 'D', 'D'), left = NodeId('D', 'D', 'D'), right = NodeId('D', 'D', 'D')),
+      Node(id = NodeId('E', 'E', 'E'), left = NodeId('E', 'E', 'E'), right = NodeId('E', 'E', 'E')),
+      Node(id = NodeId('G', 'G', 'G'), left = NodeId('G', 'G', 'G'), right = NodeId('G', 'G', 'G')),
+      Node(id = NodeId('Z', 'Z', 'Z'), left = NodeId('Z', 'Z', 'Z'), right = NodeId('Z', 'Z', 'Z'))
     )
   )
 
@@ -80,8 +104,8 @@ object Day8Suite:
   val smallNavigationDocument2: NavigationDocument = NavigationDocument(
     directions = NonEmptyList.of(L, L, R),
     nodes = NonEmptyList.of(
-      Node(id = NodeId("AAA"), left = NodeId("BBB"), right = NodeId("BBB")),
-      Node(id = NodeId("BBB"), left = NodeId("AAA"), right = NodeId("ZZZ")),
-      Node(id = NodeId("ZZZ"), left = NodeId("ZZZ"), right = NodeId("ZZZ"))
+      Node(id = NodeId('A', 'A', 'A'), left = NodeId('B', 'B', 'B'), right = NodeId('B', 'B', 'B')),
+      Node(id = NodeId('B', 'B', 'B'), left = NodeId('A', 'A', 'A'), right = NodeId('Z', 'Z', 'Z')),
+      Node(id = NodeId('Z', 'Z', 'Z'), left = NodeId('Z', 'Z', 'Z'), right = NodeId('Z', 'Z', 'Z'))
     )
   )
