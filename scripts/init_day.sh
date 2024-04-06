@@ -8,7 +8,9 @@ cat <<EOT >> "src/main/scala/Day${AOC_DAY}.scala"
 import cats.derived.*
 import cats.implicits.*
 
-def day${AOC_DAY}: Int = 42
+object Day${AOC_DAY}:
+
+  def day${AOC_DAY}: Int = 42
 EOT
 
 touch "src/test/scala/day${AOC_DAY}_input.txt"
@@ -17,6 +19,7 @@ cat <<EOT >> "src/test/scala/Day${AOC_DAY}Suite.scala"
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
+import Day${AOC_DAY}.*
 import Day${AOC_DAY}Suite.*
 
 class Day${AOC_DAY}Suite extends ScalaCheckSuite:
