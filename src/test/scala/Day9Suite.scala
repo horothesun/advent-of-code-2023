@@ -76,11 +76,6 @@ class Day9Suite extends ScalaCheckSuite:
   }
 
   test("small input all prediction sum is 114") {
-    val smallInput = NonEmptyList.of(
-      "0 3 6 9 12 15",
-      "1 3 6 10 15 21",
-      "10 13 16 21 30 45"
-    )
     assertEquals(allPredictionsSum(smallInput), Some(114L))
   }
 
@@ -88,6 +83,27 @@ class Day9Suite extends ScalaCheckSuite:
     assertEquals(allPredictionsSum(bigInput), Some(1_702_218_515L))
   }
 
+  test("\"10 13 16 21 30 45\" all past predictions are List(5, 5, -2, 2, 0)") {
+    assertEquals(
+      allPastPredictions(History(NonEmptyList.of(10, 13, 16, 21, 30, 45))),
+      List(5L, 5L, -2L, 2L, 0L)
+    )
+  }
+
+  test("small input all past prediction sum is 2") {
+    assertEquals(allPastPredictionsSum(smallInput), Some(2L))
+  }
+
+  test("big input all past prediction sum is 925") {
+    assertEquals(allPastPredictionsSum(bigInput), Some(925L))
+  }
+
 object Day9Suite:
+
+  val smallInput: NonEmptyList[String] = NonEmptyList.of(
+    "0 3 6 9 12 15",
+    "1 3 6 10 15 21",
+    "10 13 16 21 30 45"
+  )
 
   val bigInput: NonEmptyList[String] = getLinesFromFile("src/test/scala/day9_input.txt").toNel.get

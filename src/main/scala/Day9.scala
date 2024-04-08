@@ -37,3 +37,18 @@ object Day9:
 
   def allPredictionsSum(inputs: NonEmptyList[String]): Option[Long] =
     parse(inputs).flatMap(hs => hs.traverse(prediction)).map(_.sumAll)
+
+  def allPastPredictions(h: History): List[Long] =
+    val triangle = NonEmptyList(h.values, allDifferences(h)).reverse
+    val lastPred = if (triangle.head.forall(_ == 0)) 0 else triangle.head.head
+    triangle
+      .foldLeft[(List[Long], Long)]((List.empty, lastPred)) { case ((preds, firstPred), revDiffs) =>
+        val pastPred = revDiffs.head - firstPred
+        (pastPred :: preds, pastPred)
+      }
+      ._1
+
+  def pastPrediction(h: History): Option[Long] = allPastPredictions(h).headOption
+
+  def allPastPredictionsSum(inputs: NonEmptyList[String]): Option[Long] =
+    parse(inputs).flatMap(hs => hs.traverse(pastPrediction)).map(_.sumAll)
