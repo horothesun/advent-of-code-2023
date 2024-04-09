@@ -55,9 +55,8 @@ object Day5:
 
   case class CategoryMapItem(destination: Long, source: Long, length: Long)
   object CategoryMapItem:
-    def from(input: String): Option[CategoryMapItem] = input.split(' ').toList.traverse(_.toLongOption) match
-      case Some(d :: s :: l :: Nil) => Some(CategoryMapItem(d, s, l))
-      case _                        => None
+    def from(input: String): Option[CategoryMapItem] =
+      input.split(' ').toList.traverse(_.toLongOption).collect { case d :: s :: l :: Nil => CategoryMapItem(d, s, l) }
 
   case class CategoryMappings(
     seedToSoil: List[CategoryMapItem],
