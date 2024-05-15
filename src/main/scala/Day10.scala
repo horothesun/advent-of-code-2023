@@ -61,13 +61,13 @@ object Day10:
 
     def get(pos: Pos): Option[Tile] = rows.get(pos.row).flatMap(_.get(pos.col))
 
-    def oneStepFrom(pos: Pos): Set[(Tile, Pos)] = get(pos).toSet.flatMap {
+    def oneStepFrom(pos: Pos): Set[Pos] = get(pos).toSet.flatMap {
       case Ground         => Set.empty
       case Start          => oneStepFromStart(pos)
       case Pipe(pipeType) => oneStepFrom(pipeType, pos)
     }
 
-    def oneStepFromStart(pos: Pos): Set[(Tile, Pos)] =
+    def oneStepFromStart(pos: Pos): Set[Pos] =
       List(
         oneStepNorthOfStart(pos),
         oneStepSouthOfStart(pos),
@@ -75,30 +75,30 @@ object Day10:
         oneStepEastOfStart(pos)
       ).mapFilter(identity).toSet
 
-    def oneStepNorthOfStart(pos: Pos): Option[(Tile, Pos)] = get(pos.north).collect {
+    def oneStepNorthOfStart(pos: Pos): Option[Pos] = get(pos.north).collect {
       case t @ Pipe(Vertical)     => t
       case t @ Pipe(SouthAndWest) => t
       case t @ Pipe(SouthAndEast) => t
-    }.map((_, pos.north))
-    def oneStepSouthOfStart(pos: Pos): Option[(Tile, Pos)] = get(pos.south).collect {
+    }.map(_ => pos.north)
+    def oneStepSouthOfStart(pos: Pos): Option[Pos] = get(pos.south).collect {
       case t @ Pipe(Vertical)     => t
       case t @ Pipe(NorthAndWest) => t
       case t @ Pipe(NorthAndEast) => t
-    }.map((_, pos.south))
-    def oneStepWestOfStart(pos: Pos): Option[(Tile, Pos)] = get(pos.west).collect {
+    }.map(_ => pos.south)
+    def oneStepWestOfStart(pos: Pos): Option[Pos] = get(pos.west).collect {
       case t @ Pipe(Horizontal)   => t
       case t @ Pipe(NorthAndEast) => t
       case t @ Pipe(SouthAndEast) => t
-    }.map((_, pos.west))
-    def oneStepEastOfStart(pos: Pos): Option[(Tile, Pos)] = get(pos.east).collect {
+    }.map(_ => pos.west)
+    def oneStepEastOfStart(pos: Pos): Option[Pos] = get(pos.east).collect {
       case t @ Pipe(Horizontal)   => t
       case t @ Pipe(NorthAndWest) => t
       case t @ Pipe(SouthAndWest) => t
-    }.map((_, pos.east))
+    }.map(_ => pos.east)
 
-    def oneStepFrom(pipeType: PipeType, pos: Pos): Set[(Tile, Pos)] =
-      def validTiles(optPs: Option[Pos]*): Set[(Tile, Pos)] =
-        optPs.toList.mapFilter(optP => optP.flatMap(p => get(p).map((_, p)))).toSet
+    def oneStepFrom(pipeType: PipeType, pos: Pos): Set[Pos] =
+      def validTiles(optPs: Option[Pos]*): Set[Pos] =
+        optPs.toList.mapFilter(optP => optP.flatMap(p => get(p).map(_ => p))).toSet
       val cc = CandidateConnections.parse(pipeType, pos)
       pipeType match
         case Vertical     => validTiles(cc.north, cc.south)
@@ -108,14 +108,14 @@ object Day10:
         case SouthAndWest => validTiles(cc.south, cc.west)
         case SouthAndEast => validTiles(cc.south, cc.east)
 
-    def getLoop: Option[Loop] = for {
+    def loop: Option[Loop] = for {
       s <- getStartPos
       case (fst, snd) <- exactly2Adjacent(s)
-      loop <- getLoopPaths(fstLast = fst, fstPath = NonEmptyList.one(s), sndLast = snd, sndPath = NonEmptyList.one(s))
+      loop <- loopPaths(fstLast = fst, fstPath = NonEmptyList.one(s), sndLast = snd, sndPath = NonEmptyList.one(s))
     } yield loop
 
     @tailrec
-    final def getLoopPaths(
+    final def loopPaths(
       fstLast: Pos,
       fstPath: NonEmptyList[Pos],
       sndLast: Pos,
@@ -128,12 +128,12 @@ object Day10:
           nextUnvisited(sndLast, sndPath)
         ).tupled match
           case Some((newFstLast, newSndLast)) =>
-            getLoopPaths(newFstLast, fstPath :+ fstLast, newSndLast, sndPath :+ sndLast)
+            loopPaths(newFstLast, fstPath :+ fstLast, newSndLast, sndPath :+ sndLast)
           case None => None
 
     def exactly2Adjacent(pos: Pos): Option[(Pos, Pos)] = oneStepFrom(pos).toList match
-      case (_, fst) :: (_, snd) :: Nil => Some((fst, snd))
-      case _                           => None
+      case fst :: snd :: Nil => Some((fst, snd))
+      case _                 => None
 
     def nextUnvisited(pos: Pos, visited: NonEmptyList[Pos]): Option[Pos] = exactly2Adjacent(pos).flatMap {
       case (fst, snd) =>
@@ -147,4 +147,4 @@ object Day10:
       input.traverse(r => r.toList.traverse(Tile.parse).map(_.toVector)).map(rs => Field(rs.toVector))
 
   def stepsCountToFarthestInLoop(input: List[String]): Option[Int] =
-    Field.parse(input).flatMap(f => f.getLoop.map(_.firstPath.length - 1))
+    Field.parse(input).flatMap(f => f.loop.map(_.firstPath.length - 1))
