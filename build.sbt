@@ -10,7 +10,7 @@ val drosteVersion = "0.9.0"
 
 val munitVersion = "1.0.0"
 
-val disciplineMunitVersion = "1.0.9"
+val disciplineMunitVersion = "2.0.0"
 
 val munitCatsEffectVersion = "1.0.7"
 
