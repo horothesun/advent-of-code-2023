@@ -1,4 +1,4 @@
-val catsVersion = "2.10.0"
+val catsVersion = "2.12.0"
 
 val kittensVersion = "3.3.0"
 
