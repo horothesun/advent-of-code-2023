@@ -59,7 +59,7 @@ object Day10:
   enum TileType:
     case InsideLoop, OutsideLoop, OnLoop
 
-  enum InversionToEast:
+  enum Inversion:
     case Straight, NorthToSouth, SouthToNorth
 
   case class Field(rows: Vector[Vector[Tile]]):
@@ -168,7 +168,7 @@ object Day10:
         val isEven: Int => Boolean = _ % 2 == 0
         if (isEven(inversionsCount)) OutsideLoop else InsideLoop
 
-    def inversionsToEast(loopCols: Set[Int], pos: Pos, row: Vector[Tile]): List[InversionToEast] = ???
+    def inversionsToEast(loopCols: Set[Int], pos: Pos, row: Vector[Tile]): List[Inversion] = ???
 
   object Field:
     def parse(input: List[String]): Option[Field] =
