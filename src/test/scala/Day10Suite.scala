@@ -34,36 +34,36 @@ class Day10Suite extends ScalaCheckSuite:
   }
 
   test("start position for smallInput1 is Pos(row = 1, col = 1)") {
-    assertEquals(Field.parse(smallInput1).flatMap(_.getStartPos), Some(Pos(row = 1, col = 1)))
+    assertEquals(Field.parse(smallInput1).flatMap(_.startPos), Some(Pos(row = 1, col = 1)))
   }
 
   test("start position for smallSimplifiedInput1 is Pos(row = 1, col = 1)") {
     assertEquals(
-      Field.parse(smallSimplifiedInput1).flatMap(_.getStartPos),
+      Field.parse(smallSimplifiedInput1).flatMap(_.startPos),
       Some(Pos(row = 1, col = 1))
     )
   }
 
   test("start position for smallInput2 is Pos(row = 2, col = 0)") {
-    assertEquals(Field.parse(smallInput2).flatMap(_.getStartPos), Some(Pos(row = 2, col = 0)))
+    assertEquals(Field.parse(smallInput2).flatMap(_.startPos), Some(Pos(row = 2, col = 0)))
   }
 
   test("start position for smallSimplifiedInput2 is Pos(row = 2, col = 0)") {
     assertEquals(
-      Field.parse(smallSimplifiedInput2).flatMap(_.getStartPos),
+      Field.parse(smallSimplifiedInput2).flatMap(_.startPos),
       Some(Pos(row = 2, col = 0))
     )
   }
 
   test("start position for big input is defined") {
-    assert(Field.parse(bigInput).flatMap(_.getStartPos).isDefined)
+    assert(Field.parse(bigInput).flatMap(_.startPos).isDefined)
   }
 
   test("one-step moves from start found for smallInput1") {
     assertEquals(
       for {
         field <- Field.parse(smallInput1)
-        start <- field.getStartPos
+        start <- field.startPos
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 1, col = 2), Pos(row = 2, col = 1)))
     )
@@ -73,7 +73,7 @@ class Day10Suite extends ScalaCheckSuite:
     assertEquals(
       for {
         field <- Field.parse(smallSimplifiedInput1)
-        start <- field.getStartPos
+        start <- field.startPos
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 1, col = 2), Pos(row = 2, col = 1)))
     )
@@ -83,7 +83,7 @@ class Day10Suite extends ScalaCheckSuite:
     assertEquals(
       for {
         field <- Field.parse(smallInput2)
-        start <- field.getStartPos
+        start <- field.startPos
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 2, col = 1), Pos(row = 3, col = 0)))
     )
@@ -93,7 +93,7 @@ class Day10Suite extends ScalaCheckSuite:
     assertEquals(
       for {
         field <- Field.parse(smallSimplifiedInput2)
-        start <- field.getStartPos
+        start <- field.startPos
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 2, col = 1), Pos(row = 3, col = 0)))
     )
@@ -103,7 +103,7 @@ class Day10Suite extends ScalaCheckSuite:
     assertEquals(
       for {
         field <- Field.parse(bigInput)
-        start <- field.getStartPos
+        start <- field.startPos
       } yield field.oneStepFrom(start).size,
       Some(2)
     )

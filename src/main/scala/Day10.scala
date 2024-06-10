@@ -1,8 +1,10 @@
-import cats.data.NonEmptyList
+import cats.data.{NonEmptyList, NonEmptyMap, NonEmptySet}
 import cats.implicits.*
+import cats.Order
 import scala.annotation.tailrec
 import Day10.PipeType.*
 import Day10.Tile.*
+import Day10.TileType.*
 
 object Day10:
 
@@ -34,6 +36,8 @@ object Day10:
     lazy val south: Pos = Pos(row + 1, col)
     lazy val west: Pos = Pos(row, col - 1)
     lazy val east: Pos = Pos(row, col + 1)
+  object Pos:
+    given Order[Pos] = Order[String].contramap(_.toString)
 
   enum Tile:
     case Ground, Start
@@ -47,10 +51,19 @@ object Day10:
         case _   => None
     }
 
-  case class Loop(firstPath: NonEmptyList[Pos], secondPath: NonEmptyList[Pos])
+  case class Loop(firstPath: NonEmptyList[Pos], secondPath: NonEmptyList[Pos]):
+    lazy val allPositions: NonEmptySet[Pos] = firstPath.concatNel(secondPath).toNes
+    lazy val columnsByRow: NonEmptyMap[Int, Set[Int]] =
+      allPositions.toNonEmptyList.map(p => (p.row, allPositions.collect { case Pos(r, c) if r == p.row => c })).toNem
+
+  enum TileType:
+    case InsideLoop, OutsideLoop, OnLoop
+
+  enum InversionToEast:
+    case Straight, NorthToSouth, SouthToNorth
 
   case class Field(rows: Vector[Vector[Tile]]):
-    def getStartPos: Option[Pos] =
+    def startPos: Option[Pos] =
       val rowIndexes = Range(start = 0, end = rows.length).toList
       val colIndexes = rows.get(0).fold(ifEmpty = List.empty[Int])(r => Range(start = 0, end = r.length).toList)
       val allPositions = rowIndexes.flatMap(row => colIndexes.map(col => Pos(row, col)))
@@ -108,8 +121,8 @@ object Day10:
         case SouthAndWest => validTiles(cc.south, cc.west)
         case SouthAndEast => validTiles(cc.south, cc.east)
 
-    def loop: Option[Loop] = for {
-      s <- getStartPos
+    lazy val loop: Option[Loop] = for {
+      s <- startPos
       case (fst, snd) <- exactly2Adjacent(s)
       loop <- loopPaths(fstLast = fst, fstPath = NonEmptyList.one(s), sndLast = snd, sndPath = NonEmptyList.one(s))
     } yield loop
@@ -141,6 +154,21 @@ object Day10:
           case p :: Nil => Some(p)
           case _        => None
     }
+
+    def allTileTypes(l: Loop): Vector[Vector[TileType]] = allPositions.map(_.map(tileTypeAt(l, _)))
+
+    def allPositions: Vector[Vector[Pos]] = Range(start = 0, end = rows.length).toVector
+      .map(r => Range(start = 0, end = rows(r).length).map(c => Pos(r, c)).toVector)
+
+    def tileTypeAt(l: Loop, pos: Pos): TileType =
+      if (l.allPositions.contains(pos)) OnLoop
+      else
+        val loopCols = l.columnsByRow(pos.row).getOrElse(Set.empty)
+        val inversionsCount = inversionsToEast(loopCols, pos, row = rows(pos.row)).length
+        val isEven: Int => Boolean = _ % 2 == 0
+        if (isEven(inversionsCount)) OutsideLoop else InsideLoop
+
+    def inversionsToEast(loopCols: Set[Int], pos: Pos, row: Vector[Tile]): List[InversionToEast] = ???
 
   object Field:
     def parse(input: List[String]): Option[Field] =
