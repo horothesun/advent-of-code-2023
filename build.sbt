@@ -8,7 +8,7 @@ val catsParseVersion = "1.0.0"
 
 val drosteVersion = "0.9.0"
 
-val munitVersion = "1.0.0"
+val munitVersion = "1.0.1"
 
 val disciplineMunitVersion = "2.0.0"
 
