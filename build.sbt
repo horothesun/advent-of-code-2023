@@ -10,6 +10,8 @@ val drosteVersion = "0.9.0"
 
 val munitVersion = "1.0.1"
 
+val munitScalacheckVersion = "1.0.0"
+
 val disciplineMunitVersion = "2.0.0"
 
 val munitCatsEffectVersion = "2.0.0"
@@ -28,7 +30,7 @@ lazy val root = project
       "io.higherkindness" %% "droste-core" % drosteVersion,
       "org.typelevel" %% "cats-laws" % catsVersion % Test,
       "org.scalameta" %% "munit" % munitVersion % Test,
-      "org.scalameta" %% "munit-scalacheck" % munitVersion % Test,
+      "org.scalameta" %% "munit-scalacheck" % munitScalacheckVersion % Test,
       "org.typelevel" %% "discipline-munit" % disciplineMunitVersion % Test,
       "org.typelevel" %% "munit-cats-effect" % munitCatsEffectVersion % Test
     ),
