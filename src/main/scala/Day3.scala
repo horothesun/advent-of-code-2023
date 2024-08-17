@@ -1,5 +1,5 @@
 import cats.derived.*
-import cats.implicits.*
+import cats.syntax.all.*
 import cats.Traverse
 
 object Day3:

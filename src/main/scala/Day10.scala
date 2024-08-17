@@ -1,5 +1,5 @@
 import cats.data.{NonEmptyList, NonEmptyMap, NonEmptySet}
-import cats.implicits.*
+import cats.syntax.all.*
 import cats.Order
 import scala.annotation.tailrec
 import Day10.PipeType.*

@@ -8,43 +8,36 @@ class Day8Suite extends ScalaCheckSuite:
 
   // part 1
 
-  test("parse \"AAA = (BBB, CCC)\" node") {
+  test("parse \"AAA = (BBB, CCC)\" node"):
     assertEquals(
       Node.parse("AAA = (BBB, CCC)"),
       Some(Node(id = NodeId('A', 'A', 'A'), left = NodeId('B', 'B', 'B'), right = NodeId('C', 'C', 'C')))
     )
-  }
 
-  test("parse \"RLLRRL\" directions") {
+  test("parse \"RLLRRL\" directions"):
     assertEquals(
       NavigationDocument.parseDirections(NonEmptyList.of('R', 'L', 'L', 'R', 'R', 'L')),
       Some(NonEmptyList.of(R, L, L, R, R, L))
     )
-  }
 
-  test("parse first small input") {
+  test("parse first small input"):
     assertEquals(NavigationDocument.parse(smallInput1), Some(smallNavigationDocument1))
-  }
 
-  test("parse second small input") {
+  test("parse second small input"):
     assertEquals(NavigationDocument.parse(smallInput2), Some(smallNavigationDocument2))
-  }
 
-  test("first small navigation document requires 2 steps to reach final node") {
+  test("first small navigation document requires 2 steps to reach final node"):
     assertEquals(stepsCountToFinish(smallNavigationDocument1), Some(StepsCount(2)))
-  }
 
-  test("second small navigation document requires 6 steps to reach final node") {
+  test("second small navigation document requires 6 steps to reach final node"):
     assertEquals(stepsCountToFinish(smallNavigationDocument2), Some(StepsCount(6)))
-  }
 
-  test("big input requires 17_263 steps to reach final node") {
+  test("big input requires 17_263 steps to reach final node"):
     assertEquals(stepsCountToFinish(bigInput), Some(StepsCount(17_263)))
-  }
 
   // part 2
 
-  test("third small input requires 6 steps to reach final node as a ghost") {
+  test("third small input requires 6 steps to reach final node as a ghost"):
     val smallInput3 = List(
       "LR",
       "",
@@ -58,11 +51,9 @@ class Day8Suite extends ScalaCheckSuite:
       "XXX = (XXX, XXX)"
     )
     assertEquals(stepsCountToFinishGhost(smallInput3), Some(StepsCount(6)))
-  }
 
-//  test("big input requires ??? steps to reach final node as ghost") {
+//  test("big input requires ??? steps to reach final node as ghost"):
 //    assertEquals(stepsCountToFinishGhost(bigInput), Some(StepsCount(???)))
-//  }
 
 object Day8Suite:
 

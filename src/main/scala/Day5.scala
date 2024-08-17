@@ -1,4 +1,4 @@
-import cats.implicits.*
+import cats.syntax.all.*
 import fs2.{Pure, Stream}
 import scala.annotation.tailrec
 import scala.math.Ordering

@@ -6,17 +6,15 @@ import Day4Suite.*
 
 class Day4Suite extends ScalaCheckSuite:
 
-  test("consecutiveDeduped(List(1, 2, 2, 3, 4, 2, 5), toDedupe = 2) == List(1, 2, 3, 4, 2, 5)") {
+  test("consecutiveDeduped(List(1, 2, 2, 3, 4, 2, 5), toDedupe = 2) == List(1, 2, 3, 4, 2, 5)"):
     assertEquals(consecutiveDeduped(List(1, 2, 2, 3, 4, 2, 5), toDedupe = 2), List(1, 2, 3, 4, 2, 5))
-  }
 
-  property("consecutiveDeduped(n_times_c, toDedupe = c).length == 1") {
+  property("consecutiveDeduped(n_times_c, toDedupe = c).length == 1"):
     forAll(Gen.chooseNum(1, 100), Gen.alphaChar) { (n, c) =>
       assertEquals(consecutiveDeduped(List.fill(n)(c), toDedupe = c).length, 1)
     }
-  }
 
-  property("consecutiveDeduped(n_numChars ++ x_times_c ++ m_numChars, toDedupe = c).length == n + 1 + m") {
+  property("consecutiveDeduped(n_numChars ++ x_times_c ++ m_numChars, toDedupe = c).length == n + 1 + m"):
     forAll(
       Gen.chooseNum(1, 100),
       Gen.chooseNum(1, 100),
@@ -27,48 +25,38 @@ class Day4Suite extends ScalaCheckSuite:
       val chars = List.fill(n)(num) ++ List.fill(x)(c) ++ List.fill(m)(num)
       assertEquals(consecutiveDeduped(chars, toDedupe = c).length, n + 1 + m)
     }
-  }
 
-  property("consecutiveDeduped-ing twice returns the same list") {
+  property("consecutiveDeduped-ing twice returns the same list"):
     forAll(Gen.listOf(Gen.chooseNum(0, 9))) { ns =>
       val firstRes = consecutiveDeduped(ns, 2)
       assertEquals(consecutiveDeduped(firstRes, 2), firstRes)
     }
-  }
 
-  test("whitespaceMerged(\"a  b c   def g  h\") == \"a b c def g h\"") {
+  test("whitespaceMerged(\"a  b c   def g  h\") == \"a b c def g h\""):
     assertEquals(whitespaceMerged("a  b c   def g  h"), "a b c def g h")
-  }
 
-  test("whitespaceMerged(\" abc   \") == \" abc \"") {
+  test("whitespaceMerged(\" abc   \") == \" abc \""):
     assertEquals(whitespaceMerged(" abc   "), " abc ")
-  }
 
-  test("whitespaceMerged(\"   abc \") == \" abc \"") {
+  test("whitespaceMerged(\"   abc \") == \" abc \""):
     assertEquals(whitespaceMerged("   abc "), " abc ")
-  }
 
-  test("whitespaceMerged(\"   abc   \") == \" abc \"") {
+  test("whitespaceMerged(\"   abc   \") == \" abc \""):
     assertEquals(whitespaceMerged("   abc   "), " abc ")
-  }
 
-  test("CardId.from(\"Card A\") == None") {
+  test("CardId.from(\"Card A\") == None"):
     assertEquals(CardId.from("Card A"), None)
-  }
 
-  test("CardId.from(\"Card1\") == None") {
+  test("CardId.from(\"Card1\") == None"):
     assertEquals(CardId.from("Card1"), None)
-  }
 
-  test("CardId.from(\"Card 1\") == Some(CardId(1))") {
+  test("CardId.from(\"Card 1\") == Some(CardId(1))"):
     assertEquals(CardId.from("Card 1"), Some(CardId(1)))
-  }
 
-  test("CardId.from(\"Card   42\") == Some(CardId(42))") {
+  test("CardId.from(\"Card   42\") == Some(CardId(42))"):
     assertEquals(CardId.from("Card   42"), Some(CardId(42)))
-  }
 
-  test("smallInput parsed successfully") {
+  test("smallInput parsed successfully"):
     assertEquals(
       getCards(
         List(
@@ -82,49 +70,38 @@ class Day4Suite extends ScalaCheckSuite:
       ),
       Some(smallDeck)
     )
-  }
 
-  test("Card 1 matches are 83, 86, 17 and 48") {
+  test("Card 1 matches are 83, 86, 17 and 48"):
     assertEquals(card1.getMatches, List(83, 86, 17, 48))
-  }
 
-  test("Card 1 points are 8") {
+  test("Card 1 points are 8"):
     assertEquals(getPoints(matches = List(83, 86, 17, 48)), 8L)
-  }
 
-  test("smallDeck total points are 13") {
+  test("smallDeck total points are 13"):
     assertEquals(getTotalPoints(smallDeck), 13L)
-  }
 
-  test("bigInput total points are 25_010") {
+  test("bigInput total points are 25_010"):
     assertEquals(getTotalPoints(bigInput), Some(25_010L))
-  }
 
-  test("Card 1 generates one copy of each card 2, 3, 4 and 5") {
+  test("Card 1 generates one copy of each card 2, 3, 4 and 5"):
     assertEquals(getNewCardIds(card1), List(CardId(2), CardId(3), CardId(4), CardId(5)))
-  }
 
-  test("Card 2 generates one copy of each card 3 and 4") {
+  test("Card 2 generates one copy of each card 3 and 4"):
     assertEquals(getNewCardIds(card2), List(CardId(3), CardId(4)))
-  }
 
-  test("Card 3 generates one copy of each card 4 and 5") {
+  test("Card 3 generates one copy of each card 4 and 5"):
     assertEquals(getNewCardIds(card3), List(CardId(4), CardId(5)))
-  }
 
-  test("Card 4 generates one copy of card 5") {
+  test("Card 4 generates one copy of card 5"):
     assertEquals(getNewCardIds(card4), List(CardId(5)))
-  }
 
-  test("Card 5 generates no copies of any other card") {
+  test("Card 5 generates no copies of any other card"):
     assertEquals(getNewCardIds(card5), List.empty[CardId])
-  }
 
-  test("Card 6 generates no copies of any other card") {
+  test("Card 6 generates no copies of any other card"):
     assertEquals(getNewCardIds(card6), List.empty[CardId])
-  }
 
-  test("smallDeck generates the right number of card instances") {
+  test("smallDeck generates the right number of card instances"):
     assertEquals(
       getTotalCardInstances(smallDeck),
       Map(
@@ -136,15 +113,12 @@ class Day4Suite extends ScalaCheckSuite:
         CardId(6) -> 1
       )
     )
-  }
 
-  test("smallDeck generates a total of 30 card instances") {
+  test("smallDeck generates a total of 30 card instances"):
     assertEquals(getTotalCards(smallDeck), 30)
-  }
 
-  test("bigInput generates a total of 9_924_412 card instances") {
+  test("bigInput generates a total of 9_924_412 card instances"):
     assertEquals(getTotalCards(bigInput), Some(9_924_412))
-  }
 
 object Day4Suite:
 

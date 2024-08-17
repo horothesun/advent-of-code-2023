@@ -1,4 +1,4 @@
-import cats.implicits.*
+import cats.syntax.all.*
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.math.Numeric.Implicits.infixNumericOps
 import Day6.*
