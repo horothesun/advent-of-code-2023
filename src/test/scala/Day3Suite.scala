@@ -4,22 +4,19 @@ import Day3Suite.*
 
 class Day3Suite extends ScalaCheckSuite:
 
-  test("parse(smallInput) returns the correct value") {
+  test("parse(smallInput) returns the correct value"):
     assertEquals(parse(smallInput), Some(smallRows))
-  }
 
-  test("parseRow(\".......321\") returns the correct value") {
+  test("parseRow(\".......321\") returns the correct value"):
     assertEquals(
       parseRow(".......321"),
       Some(List(Annotated(PartNumber(321), pos0Based = 7, length = 3)))
     )
-  }
 
-  test("parse(bigInput) is defined") {
+  test("parse(bigInput) is defined"):
     assert(parse(bigInput).isDefined)
-  }
 
-  test("getParts(smallRows) returns the correct Parts") {
+  test("getParts(smallRows) returns the correct Parts"):
     assertEquals(
       getParts(smallRows),
       List(
@@ -33,23 +30,18 @@ class Day3Suite extends ScalaCheckSuite:
         Part(Symbol('*'), PartNumber(598))
       )
     )
-  }
 
-  test("getPartNumbersSum(smallInput) == Some(4361)") {
+  test("getPartNumbersSum(smallInput) == Some(4361)"):
     assertEquals(getPartNumbersSum(smallInput), Some(4361))
-  }
 
-  test("getPartNumbersSum(bigInput) == Some(554_003)") {
+  test("getPartNumbersSum(bigInput) == Some(554_003)"):
     assertEquals(getPartNumbersSum(bigInput), Some(554_003))
-  }
 
-  test("getGearsRatioSum(smallInput) == Some(467_835)") {
+  test("getGearsRatioSum(smallInput) == Some(467_835)"):
     assertEquals(getGearsRatioSum(smallInput), Some(467_835))
-  }
 
-  test("getGearsRatioSum(bigInput) == Some(87_263_515)") {
+  test("getGearsRatioSum(bigInput) == Some(87_263_515)"):
     assertEquals(getGearsRatioSum(bigInput), Some(87_263_515))
-  }
 
 object Day3Suite:
 

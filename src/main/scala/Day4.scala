@@ -1,4 +1,4 @@
-import cats.implicits.*
+import cats.syntax.all.*
 
 object Day4:
 

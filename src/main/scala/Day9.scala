@@ -1,5 +1,5 @@
 import cats.data.NonEmptyList
-import cats.implicits.*
+import cats.syntax.all.*
 
 object Day9:
 

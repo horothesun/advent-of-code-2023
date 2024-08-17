@@ -6,7 +6,7 @@ AOC_DAY="$1"
 
 cat <<EOT >> "src/main/scala/Day${AOC_DAY}.scala"
 import cats.derived.*
-import cats.implicits.*
+import cats.syntax.all.*
 
 object Day${AOC_DAY}:
 
@@ -24,9 +24,8 @@ import Day${AOC_DAY}Suite.*
 
 class Day${AOC_DAY}Suite extends ScalaCheckSuite:
 
-  test("day${AOC_DAY} == 42") {
+  test("day${AOC_DAY} == 42"):
     assertEquals(day${AOC_DAY}, 42)
-  }
 
 object Day${AOC_DAY}Suite:
 

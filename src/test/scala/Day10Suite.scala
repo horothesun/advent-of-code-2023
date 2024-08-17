@@ -7,7 +7,7 @@ import Day10Suite.*
 
 class Day10Suite extends ScalaCheckSuite:
 
-  test("parsing smallInput1") {
+  test("parsing smallInput1"):
     val expected = Field(rows =
       Vector(
         Vector(Horizontal, NorthAndEast, Vertical, SouthAndEast, SouthAndWest).map(Pipe.apply),
@@ -18,9 +18,8 @@ class Day10Suite extends ScalaCheckSuite:
       )
     )
     assertEquals(Field.parse(smallInput1), Some(expected))
-  }
 
-  test("parsing smallSimplifiedInput1") {
+  test("parsing smallSimplifiedInput1"):
     val expected = Field(rows =
       Vector(
         Vector.fill(5)(Ground),
@@ -31,35 +30,29 @@ class Day10Suite extends ScalaCheckSuite:
       )
     )
     assertEquals(Field.parse(smallSimplifiedInput1), Some(expected))
-  }
 
-  test("start position for smallInput1 is Pos(row = 1, col = 1)") {
+  test("start position for smallInput1 is Pos(row = 1, col = 1)"):
     assertEquals(Field.parse(smallInput1).flatMap(_.startPos), Some(Pos(row = 1, col = 1)))
-  }
 
-  test("start position for smallSimplifiedInput1 is Pos(row = 1, col = 1)") {
+  test("start position for smallSimplifiedInput1 is Pos(row = 1, col = 1)"):
     assertEquals(
       Field.parse(smallSimplifiedInput1).flatMap(_.startPos),
       Some(Pos(row = 1, col = 1))
     )
-  }
 
-  test("start position for smallInput2 is Pos(row = 2, col = 0)") {
+  test("start position for smallInput2 is Pos(row = 2, col = 0)"):
     assertEquals(Field.parse(smallInput2).flatMap(_.startPos), Some(Pos(row = 2, col = 0)))
-  }
 
-  test("start position for smallSimplifiedInput2 is Pos(row = 2, col = 0)") {
+  test("start position for smallSimplifiedInput2 is Pos(row = 2, col = 0)"):
     assertEquals(
       Field.parse(smallSimplifiedInput2).flatMap(_.startPos),
       Some(Pos(row = 2, col = 0))
     )
-  }
 
-  test("start position for big input is defined") {
+  test("start position for big input is defined"):
     assert(Field.parse(bigInput).flatMap(_.startPos).isDefined)
-  }
 
-  test("one-step moves from start found for smallInput1") {
+  test("one-step moves from start found for smallInput1"):
     assertEquals(
       for {
         field <- Field.parse(smallInput1)
@@ -67,9 +60,8 @@ class Day10Suite extends ScalaCheckSuite:
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 1, col = 2), Pos(row = 2, col = 1)))
     )
-  }
 
-  test("one-step moves from start found for smallSimplifiedInput1") {
+  test("one-step moves from start found for smallSimplifiedInput1"):
     assertEquals(
       for {
         field <- Field.parse(smallSimplifiedInput1)
@@ -77,9 +69,8 @@ class Day10Suite extends ScalaCheckSuite:
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 1, col = 2), Pos(row = 2, col = 1)))
     )
-  }
 
-  test("one-step moves from start found for smallInput2") {
+  test("one-step moves from start found for smallInput2"):
     assertEquals(
       for {
         field <- Field.parse(smallInput2)
@@ -87,9 +78,8 @@ class Day10Suite extends ScalaCheckSuite:
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 2, col = 1), Pos(row = 3, col = 0)))
     )
-  }
 
-  test("one-step moves from start found for smallSimplifiedInput2") {
+  test("one-step moves from start found for smallSimplifiedInput2"):
     assertEquals(
       for {
         field <- Field.parse(smallSimplifiedInput2)
@@ -97,9 +87,8 @@ class Day10Suite extends ScalaCheckSuite:
       } yield field.oneStepFrom(start),
       Some(Set(Pos(row = 2, col = 1), Pos(row = 3, col = 0)))
     )
-  }
 
-  test("#2 one-step moves from start found for big input") {
+  test("#2 one-step moves from start found for big input"):
     assertEquals(
       for {
         field <- Field.parse(bigInput)
@@ -107,9 +96,8 @@ class Day10Suite extends ScalaCheckSuite:
       } yield field.oneStepFrom(start).size,
       Some(2)
     )
-  }
 
-  test("loop for smallInput1") {
+  test("loop for smallInput1"):
     assertEquals(
       Field.parse(smallInput1).flatMap(_.loop),
       Some(
@@ -119,16 +107,14 @@ class Day10Suite extends ScalaCheckSuite:
         )
       )
     )
-  }
 
-  test("loop for smallInput1 is same of smallSimplifiedInput1") {
+  test("loop for smallInput1 is same of smallSimplifiedInput1"):
     assertEquals(
       Field.parse(smallInput1).flatMap(_.loop),
       Field.parse(smallSimplifiedInput1).flatMap(_.loop)
     )
-  }
 
-  test("loop for smallInput2") {
+  test("loop for smallInput2"):
     assertEquals(
       Field.parse(smallInput2).flatMap(_.loop),
       Some(
@@ -142,47 +128,39 @@ class Day10Suite extends ScalaCheckSuite:
         )
       )
     )
-  }
 
-  test("loop for smallInput2 is same of smallSimplifiedInput2") {
+  test("loop for smallInput2 is same of smallSimplifiedInput2"):
     assertEquals(
       Field.parse(smallInput2).flatMap(_.loop),
       Field.parse(smallSimplifiedInput2).flatMap(_.loop)
     )
-  }
 
-  test("steps count to farthest point in loop is 4 for smallInput1") {
+  test("steps count to farthest point in loop is 4 for smallInput1"):
     assertEquals(stepsCountToFarthestInLoop(smallInput1), Some(4))
-  }
 
-  test("steps count to farthest point in loop is same for smallInput1 and simplified one") {
+  test("steps count to farthest point in loop is same for smallInput1 and simplified one"):
     assertEquals(
       stepsCountToFarthestInLoop(smallInput1),
       stepsCountToFarthestInLoop(smallSimplifiedInput1)
     )
-  }
 
-  test("steps count to farthest point in loop is 8 for smallInput2") {
+  test("steps count to farthest point in loop is 8 for smallInput2"):
     assertEquals(stepsCountToFarthestInLoop(smallInput2), Some(8))
-  }
 
-  test("steps count to farthest point in loop is same for smallInput2 and simplified one") {
+  test("steps count to farthest point in loop is same for smallInput2 and simplified one"):
     assertEquals(
       stepsCountToFarthestInLoop(smallInput2),
       stepsCountToFarthestInLoop(smallSimplifiedInput2)
     )
-  }
 
-  test("loop branches has same length for big input") {
+  test("loop branches has same length for big input"):
     assertEquals(
       Field.parse(bigInput).flatMap(_.loop.map(l => l.firstPath.length == l.secondPath.length)),
       Some(true)
     )
-  }
 
-  test("steps count to farthest point in loop is 6_828 for big input") {
+  test("steps count to farthest point in loop is 6_828 for big input"):
     assertEquals(stepsCountToFarthestInLoop(bigInput), Some(6_828))
-  }
 
 object Day10Suite:
 

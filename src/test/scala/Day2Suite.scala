@@ -6,65 +6,50 @@ import Day2Suite.*
 
 class Day2Suite extends ScalaCheckSuite:
 
-  test("getGames(smallInput) returns correct value") {
+  test("getGames(smallInput) returns correct value"):
     assertEquals(getGames(smallInput), Some(List(game1, game2, game3, game4, game5)))
-  }
 
-  test("game1.validity(Bag.part1) == Possible") {
+  test("game1.validity(Bag.part1) == Possible"):
     assertEquals(game1.validity(Bag.part1), Possible)
-  }
 
-  test("game2.validity(Bag.part1) == Possible") {
+  test("game2.validity(Bag.part1) == Possible"):
     assertEquals(game2.validity(Bag.part1), Possible)
-  }
 
-  test("game3.validity(Bag.part1) == Impossible") {
+  test("game3.validity(Bag.part1) == Impossible"):
     assertEquals(game3.validity(Bag.part1), Impossible)
-  }
 
-  test("game4.validity(Bag.part1) == Impossible") {
+  test("game4.validity(Bag.part1) == Impossible"):
     assertEquals(game4.validity(Bag.part1), Impossible)
-  }
 
-  test("game5.validity(Bag.part1) == Possible") {
+  test("game5.validity(Bag.part1) == Possible"):
     assertEquals(game5.validity(Bag.part1), Possible)
-  }
 
-  test("getPossibleGameIdsSum(smallInput) == Some(8)") {
+  test("getPossibleGameIdsSum(smallInput) == Some(8)"):
     assertEquals(getPossibleGameIdsSum(smallInput), Some(8))
-  }
 
-  test("getPossibleGameIdsSum(bigInput) == Some(2101)") {
+  test("getPossibleGameIdsSum(bigInput) == Some(2101)"):
     assertEquals(getPossibleGameIdsSum(bigInput), Some(2101))
-  }
 
-  test("game1.fewestCubes == 4 red, 2 green, and 6 blue") {
+  test("game1.fewestCubes == 4 red, 2 green, and 6 blue"):
     assertEquals(game1.fewestCubes, Bag(cubesByColor = Map(Red -> 4, Green -> 2, Blue -> 6)))
-  }
 
-  test("game2.fewestCubes == 1 red, 3 green, and 4 blue") {
+  test("game2.fewestCubes == 1 red, 3 green, and 4 blue"):
     assertEquals(game2.fewestCubes, Bag(cubesByColor = Map(Red -> 1, Green -> 3, Blue -> 4)))
-  }
 
-  test("game3.fewestCubes == 20 red, 13 green, and 6 blue") {
+  test("game3.fewestCubes == 20 red, 13 green, and 6 blue"):
     assertEquals(game3.fewestCubes, Bag(cubesByColor = Map(Red -> 20, Green -> 13, Blue -> 6)))
-  }
 
-  test("game4.fewestCubes == 14 red, 3 green, and 15 blue") {
+  test("game4.fewestCubes == 14 red, 3 green, and 15 blue"):
     assertEquals(game4.fewestCubes, Bag(cubesByColor = Map(Red -> 14, Green -> 3, Blue -> 15)))
-  }
 
-  test("game5.fewestCubes == 6 red, 3 green, and 2 blue") {
+  test("game5.fewestCubes == 6 red, 3 green, and 2 blue"):
     assertEquals(game5.fewestCubes, Bag(cubesByColor = Map(Red -> 6, Green -> 3, Blue -> 2)))
-  }
 
-  test("getGameFewestCubesPowerSum(smallInput) == Some(2286)") {
+  test("getGameFewestCubesPowerSum(smallInput) == Some(2286)"):
     assertEquals(getGameFewestCubesPowerSum(smallInput), Some(2286))
-  }
 
-  test("getGameFewestCubesPowerSum(bigInput) == Some(58_269)") {
+  test("getGameFewestCubesPowerSum(bigInput) == Some(58_269)"):
     assertEquals(getGameFewestCubesPowerSum(bigInput), Some(58_269))
-  }
 
 object Day2Suite:
 

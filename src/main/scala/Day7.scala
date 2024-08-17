@@ -1,6 +1,6 @@
 import cats.{Order, Semigroup, SemigroupK}
 import cats.data.NonEmptyList
-import cats.implicits.*
+import cats.syntax.all.*
 import scala.util.Try
 import Day7.HandType.*
 
@@ -15,6 +15,7 @@ object Day7:
 
   object HandType:
     given Order[HandType] = Order.by(_.strength)
+    given Ordering[HandType] = Order[HandType].toOrdering
 
   trait Comparator[A]:
     def compare: (A, A) => Int
@@ -34,6 +35,7 @@ object Day7:
 
   object CardLabel:
     given Order[CardLabel] = Order.by(_.strength)
+    given Ordering[CardLabel] = Order[CardLabel].toOrdering
 
     def parse(c: Char): Option[CardLabel] = Try(CardLabel.valueOf(s"$c")).toOption
 
@@ -66,6 +68,7 @@ object Day7:
         handTypeComparator,
         List[Hand => CardLabel](_.c1, _.c2, _.c3, _.c4, _.c5).map(nthCardComparator)
       ).reduce.toOrder
+    given Ordering[Hand] = Order[Hand].toOrdering
 
     def parse(s: String): Option[Hand] =
       s.toList.traverse(CardLabel.parse).collect { case c1 :: c2 :: c3 :: c4 :: c5 :: Nil => Hand(c1, c2, c3, c4, c5) }
@@ -168,6 +171,7 @@ object Day7:
         handTypeComparator,
         List[HandJ => CardLabelJ](_.c1, _.c2, _.c3, _.c4, _.c5).map(nthCardComparator)
       ).reduce.toOrder
+    given Ordering[HandJ] = Order[HandJ].toOrdering
 
     def parse(s: String): Option[HandJ] = Hand.parse(s).map(from)
 

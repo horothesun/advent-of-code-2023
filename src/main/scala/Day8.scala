@@ -1,5 +1,5 @@
 import cats.data.NonEmptyList
-import cats.implicits.*
+import cats.syntax.all.*
 import cats.Order
 import fs2.{Pure, Stream}
 import scala.util.Try
