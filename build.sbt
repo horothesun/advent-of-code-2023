@@ -6,15 +6,21 @@ val fs2Version = "3.10.2"
 
 val catsParseVersion = "1.0.0"
 
+val catsEffectVersion = "3.5.4"
+
 val drosteVersion = "0.9.0"
 
 val munitVersion = "1.0.1"
 
 val munitScalacheckVersion = "1.0.0"
 
-val disciplineMunitVersion = "2.0.0"
-
 val munitCatsEffectVersion = "2.0.0"
+
+val scalacheckVersion = "1.18.0"
+
+val scalacheckEffectMunitVersion = "1.0.4"
+
+val disciplineMunitVersion = "2.0.0"
 
 lazy val root = project
   .in(file("."))
@@ -25,14 +31,18 @@ lazy val root = project
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
       "org.typelevel" %% "kittens" % kittensVersion,
-      "co.fs2" %% "fs2-core" % fs2Version,
       "org.typelevel" %% "cats-parse" % catsParseVersion,
+      "org.typelevel" %% "cats-effect" % catsEffectVersion,
+      "co.fs2" %% "fs2-core" % fs2Version,
       "io.higherkindness" %% "droste-core" % drosteVersion,
-      "org.typelevel" %% "cats-laws" % catsVersion % Test,
       "org.scalameta" %% "munit" % munitVersion % Test,
+      "org.typelevel" %% "munit-cats-effect" % munitCatsEffectVersion % Test,
       "org.scalameta" %% "munit-scalacheck" % munitScalacheckVersion % Test,
-      "org.typelevel" %% "discipline-munit" % disciplineMunitVersion % Test,
-      "org.typelevel" %% "munit-cats-effect" % munitCatsEffectVersion % Test
+      "org.scalacheck" %% "scalacheck" % scalacheckVersion % Test,
+      "org.typelevel" %% "scalacheck-effect-munit" % scalacheckEffectMunitVersion % Test,
+      "org.typelevel" %% "cats-effect-testkit" % catsEffectVersion % Test,
+      "org.typelevel" %% "cats-laws" % catsVersion % Test,
+      "org.typelevel" %% "discipline-munit" % disciplineMunitVersion % Test
     ),
     scalacOptions ++= Seq(
       "-deprecation",
