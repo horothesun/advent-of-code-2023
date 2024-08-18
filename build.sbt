@@ -2,11 +2,11 @@ val catsVersion = "2.12.0"
 
 val kittensVersion = "3.3.0"
 
-val fs2Version = "3.10.2"
-
 val catsParseVersion = "1.0.0"
 
 val catsEffectVersion = "3.5.4"
+
+val fs2Version = "3.10.2"
 
 val drosteVersion = "0.9.0"
 
