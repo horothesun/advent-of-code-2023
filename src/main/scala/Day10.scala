@@ -1,12 +1,17 @@
-import cats.data.{NonEmptyList, NonEmptyMap, NonEmptySet}
+import cats.data.{NonEmptyList, NonEmptySet}
 import cats.syntax.all.*
 import cats.Order
 import scala.annotation.tailrec
+import Day10.CardinalDirection.*
+import Day10.Field.*
+import Day10.Inversion.*
 import Day10.PipeType.*
 import Day10.Tile.*
-import Day10.TileType.*
 
 object Day10:
+
+  enum CardinalDirection:
+    case North, South, West, East
 
   enum PipeType:
     case Vertical, Horizontal, NorthAndWest, NorthAndEast, SouthAndWest, SouthAndEast
@@ -36,6 +41,14 @@ object Day10:
     lazy val south: Pos = Pos(row + 1, col)
     lazy val west: Pos = Pos(row, col - 1)
     lazy val east: Pos = Pos(row, col + 1)
+
+    def cardinalDirectionOf(that: Pos): Option[CardinalDirection] =
+      if (that == north) Some(North)
+      else if (that == south) Some(South)
+      else if (that == west) Some(West)
+      else if (that == east) Some(East)
+      else None
+
   object Pos:
     given Order[Pos] = Order[String].contramap(_.toString)
 
@@ -52,9 +65,26 @@ object Day10:
     }
 
   case class Loop(firstPath: NonEmptyList[Pos], secondPath: NonEmptyList[Pos]):
+
     lazy val allPositions: NonEmptySet[Pos] = firstPath.concatNel(secondPath).toNes
-    lazy val columnsByRow: NonEmptyMap[Int, Set[Int]] =
-      allPositions.toNonEmptyList.map(p => (p.row, allPositions.collect { case Pos(r, c) if r == p.row => c })).toNem
+
+    lazy val startAs: Option[PipeType] =
+      def nextCardinalDirection(path: NonEmptyList[Pos]): Option[CardinalDirection] =
+        val s = firstPath.head
+        path.tail.headOption.flatMap(s.cardinalDirectionOf)
+
+      (nextCardinalDirection(firstPath), nextCardinalDirection(secondPath)).flatMapN {
+        case (North, South) | (South, North) => Some(Vertical)
+        case (North, West) | (West, North)   => Some(NorthAndWest)
+        case (North, East) | (East, North)   => Some(NorthAndEast)
+        case (South, West) | (West, South)   => Some(SouthAndWest)
+        case (South, East) | (East, South)   => Some(SouthAndEast)
+        case (West, East) | (East, West)     => Some(Horizontal)
+        case _                               => None
+      }
+
+  enum TileRawType:
+    case OnLoop, NotOnLoop
 
   enum TileType:
     case InsideLoop, OutsideLoop, OnLoop
@@ -155,24 +185,63 @@ object Day10:
           case _        => None
     }
 
-    def allTileTypes(l: Loop): Vector[Vector[TileType]] = allPositions.map(_.map(tileTypeAt(l, _)))
+    def allTileTypes(l: Loop, startAs: PipeType): Vector[Vector[TileType]] =
+      allPositions.map(_.map(tileTypeAt(l, startAs, _)))
 
     def allPositions: Vector[Vector[Pos]] = Range(start = 0, end = rows.length).toVector
       .map(r => Range(start = 0, end = rows(r).length).map(c => Pos(r, c)).toVector)
 
-    def tileTypeAt(l: Loop, pos: Pos): TileType =
-      if (l.allPositions.contains(pos)) OnLoop
+    def tileTypeAt(l: Loop, startAs: PipeType, pos: Pos): TileType =
+      if (l.allPositions.contains(pos)) TileType.OnLoop
       else
-        val loopCols = l.columnsByRow(pos.row).getOrElse(Set.empty)
-        val inversionsCount = inversionsToEast(loopCols, pos, row = rows(pos.row)).length
+        val row = rows(pos.row).zipWithIndex.map { (tile, col) =>
+          import TileRawType.*
+          val tileRawType = if (l.allPositions.contains(Pos(pos.row, col))) OnLoop else NotOnLoop
+          (tile, tileRawType)
+        }
+        val inversionsCount = inversionsToEast(fromCol = pos.col, startAs, row).length
         val isEven: Int => Boolean = _ % 2 == 0
-        if (isEven(inversionsCount)) OutsideLoop else InsideLoop
-
-    def inversionsToEast(loopCols: Set[Int], pos: Pos, row: Vector[Tile]): List[Inversion] = ???
+        if (isEven(inversionsCount)) TileType.OutsideLoop else TileType.InsideLoop
 
   object Field:
     def parse(input: List[String]): Option[Field] =
       input.traverse(r => r.toList.traverse(Tile.parse).map(_.toVector)).map(rs => Field(rs.toVector))
 
+    def inversionsToEast(fromCol: Int, startAs: PipeType, row: Vector[(Tile, TileRawType)]): List[Inversion] =
+      row
+        .drop(fromCol)
+        .mapFilter { (tile, tileRawType) =>
+          tileRawType match
+            case TileRawType.OnLoop    => Some(tile)
+            case TileRawType.NotOnLoop => None
+        }
+        .mapFilter {
+          case Ground | Pipe(Horizontal) => None
+          case Start                     => Some(startAs)
+          case Pipe(pipeType)            => Some(pipeType)
+        }
+        .foldLeft[(List[Inversion], Option[PipeType])]((List.empty, None)) { case ((acc, open), pipeType) =>
+          pipeType match
+            case Vertical /* | */                            => (acc :+ Straight, None)
+            case Horizontal /* - */                          => (acc, open)
+            case NorthAndEast /* L */ | SouthAndEast /* F */ => (acc, Some(pipeType))
+            case NorthAndWest /* J */ =>
+              open match
+                case Some(SouthAndEast) /* F */ => (acc :+ SouthToNorth, None)
+                case _                          => (acc, None)
+            case SouthAndWest /* 7 */ =>
+              open match
+                case Some(NorthAndEast) /* L */ => (acc :+ NorthToSouth, None)
+                case _                          => (acc, None)
+        }
+        ._1
+
   def stepsCountToFarthestInLoop(input: List[String]): Option[Int] =
-    Field.parse(input).flatMap(f => f.loop.map(_.firstPath.length - 1))
+    Field.parse(input).flatMap(_.loop.map(_.firstPath.length - 1))
+
+  def countTilesInsideLoop(input: List[String]): Option[Int] =
+    for {
+      field <- Field.parse(input)
+      loop <- field.loop
+      startAs <- loop.startAs
+    } yield field.allTileTypes(loop, startAs).map(_.count(_ == TileType.InsideLoop)).sum

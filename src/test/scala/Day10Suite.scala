@@ -1,8 +1,13 @@
 import cats.data.NonEmptyList
 import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.*
 import Day10.*
+import Day10.CardinalDirection.*
+import Day10.Inversion.*
 import Day10.PipeType.*
 import Day10.Tile.*
+import Day10.TileRawType.*
 import Day10Suite.*
 
 class Day10Suite extends ScalaCheckSuite:
@@ -162,6 +167,74 @@ class Day10Suite extends ScalaCheckSuite:
   test("steps count to farthest point in loop is 6_828 for big input"):
     assertEquals(stepsCountToFarthestInLoop(bigInput), Some(6_828))
 
+  property("cardinal direction of p.north is Some(North), for any p: Pos"):
+    forAll(posGen)(p => assertEquals(p.cardinalDirectionOf(p.north), Some(North)))
+
+  property("cardinal direction of p.south is Some(South), for any p: Pos"):
+    forAll(posGen)(p => assertEquals(p.cardinalDirectionOf(p.south), Some(South)))
+
+  property("cardinal direction of p.west is Some(West), for any p: Pos"):
+    forAll(posGen)(p => assertEquals(p.cardinalDirectionOf(p.west), Some(West)))
+
+  property("cardinal direction of p.east is Some(East), for any p: Pos"):
+    forAll(posGen)(p => assertEquals(p.cardinalDirectionOf(p.east), Some(East)))
+
+  property("cardinal direction of p.north.east is None, for any p: Pos"):
+    forAll(posGen)(p => assertEquals(p.cardinalDirectionOf(p.north.east), None))
+
+  property("inversions to East are empty when loop is NOT in the row, from any column and for any row"):
+    val n = 10
+    forAll(
+      Gen.zip(
+        Gen.choose(0, n - 1),
+        pipeTypeGen,
+        tilesRowGen(n).map(_.map((_, NotOnLoop: TileRawType)))
+      )
+    ) { (fromCol, startAs, row) =>
+      assertEquals(Field.inversionsToEast(fromCol, startAs, row), List.empty)
+    }
+
+  test(
+    "inversions to East are [Straight, NorthToSouth, Straight, SouthToNorth]" +
+      " for row with loop \"..|..LS7|.F--J.\", 'S' as '-', from leftmost column"
+  ):
+    assertEquals(
+      Field.inversionsToEast(
+        fromCol = 0,
+        startAs = Horizontal,
+        row = Vector(
+          (Ground, NotOnLoop),
+          (Ground, NotOnLoop),
+          (Pipe(Vertical), OnLoop),
+          (Ground, NotOnLoop),
+          (Ground, NotOnLoop),
+          (Pipe(NorthAndEast), OnLoop),
+          (Start, OnLoop),
+          (Pipe(SouthAndWest), OnLoop),
+          (Pipe(Vertical), OnLoop),
+          (Ground, NotOnLoop),
+          (Pipe(SouthAndEast), OnLoop),
+          (Pipe(Horizontal), OnLoop),
+          (Pipe(Horizontal), OnLoop),
+          (Pipe(NorthAndWest), OnLoop),
+          (Ground, NotOnLoop)
+        )
+      ),
+      List(Straight, NorthToSouth, Straight, SouthToNorth)
+    )
+
+  test("Field from smallInput3 has 4 tiles inside the loop"):
+    assertEquals(countTilesInsideLoop(smallInput3), Some(4))
+
+  test("Field from smallInput4 has 8 tiles inside the loop"):
+    assertEquals(countTilesInsideLoop(smallInput4), Some(8))
+
+  test("Field from smallInput5 has 10 tiles inside the loop"):
+    assertEquals(countTilesInsideLoop(smallInput5), Some(10))
+
+  test("Field from bigInput has 459 tiles inside the loop"):
+    assertEquals(countTilesInsideLoop(bigInput), Some(459))
+
 object Day10Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day10_input.txt")
@@ -195,3 +268,47 @@ object Day10Suite:
     "|F--J",
     "LJ..."
   )
+
+  val smallInput3: List[String] = List(
+    "...........",
+    ".S-------7.",
+    ".|F-----7|.",
+    ".||.....||.",
+    ".||.....||.",
+    ".|L-7.F-J|.",
+    ".|..|.|..|.",
+    ".L--J.L--J.",
+    "..........."
+  )
+
+  val smallInput4: List[String] = List(
+    ".F----7F7F7F7F-7....",
+    ".|F--7||||||||FJ....",
+    ".||.FJ||||||||L7....",
+    "FJL7L7LJLJ||LJ.L-7..",
+    "L--J.L7...LJS7F-7L7.",
+    "....F-J..F7FJ|L7L7L7",
+    "....L7.F7||L7|.L7L7|",
+    ".....|FJLJ|FJ|F7|.LJ",
+    "....FJL-7.||.||||...",
+    "....L---J.LJ.LJLJ..."
+  )
+
+  val smallInput5: List[String] = List(
+    "FF7FSF7F7F7F7F7F---7",
+    "L|LJ||||||||||||F--J",
+    "FL-7LJLJ||||||LJL-77",
+    "F--JF--7||LJLJ7F7FJ-",
+    "L---JF-JLJ.||-FJLJJ7",
+    "|F|F-JF---7F7-L7L|7|",
+    "|FFJF7L7F-JF7|JL---7",
+    "7-L-JL7||F7|L7F-7F7|",
+    "L.L7LFJ|||||FJL7||LJ",
+    "L7JLJL-JLJLJL--JLJ.L"
+  )
+
+  def posGen: Gen[Pos] = Gen.zip(Gen.posNum[Int], Gen.posNum[Int]).map(Pos.apply)
+
+  def tilesRowGen(n: Int): Gen[Vector[Tile]] = Gen.listOfN(n, tileGen).map(_.toVector)
+  def tileGen: Gen[Tile] = Gen.oneOf(Gen.const(Ground), Gen.const(Start), pipeTypeGen.map(Pipe.apply))
+  def pipeTypeGen: Gen[PipeType] = Gen.oneOf(PipeType.values.toList)
