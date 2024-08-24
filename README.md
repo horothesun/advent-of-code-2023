@@ -8,7 +8,7 @@
 Initialise a new day by running
 
 ```bash
-./scripts/init_day.sh <DAY-NUMBER>
+scripts/init_day.sh <DAY-NUMBER>
 ```
 
 Test specific day with
