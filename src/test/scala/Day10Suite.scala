@@ -15,7 +15,13 @@ class Day10Suite extends ScalaCheckSuite:
     val expected = Field(rows =
       Vector(
         Vector(WestAndEast, NorthAndEast, NorthAndSouth, SouthAndEast, SouthAndWest).map(Pipe.apply),
-        Vector(Pipe(SouthAndWest), Start, Pipe(WestAndEast), Pipe(SouthAndWest), Pipe(NorthAndSouth)),
+        Vector(
+          Pipe(SouthAndWest),
+          Start,
+          Pipe(WestAndEast),
+          Pipe(SouthAndWest),
+          Pipe(NorthAndSouth)
+        ),
         Vector(NorthAndEast, NorthAndSouth, SouthAndWest, NorthAndSouth, NorthAndSouth).map(Pipe.apply),
         Vector(WestAndEast, NorthAndEast, WestAndEast, NorthAndWest, NorthAndSouth).map(Pipe.apply),
         Vector(NorthAndEast, NorthAndSouth, WestAndEast, NorthAndWest, SouthAndEast).map(Pipe.apply)
