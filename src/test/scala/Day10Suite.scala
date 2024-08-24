@@ -7,7 +7,6 @@ import Day10.CardinalDirection.*
 import Day10.Inversion.*
 import Day10.PipeType.*
 import Day10.Tile.*
-import Day10.TileRawType.*
 import Day10Suite.*
 
 class Day10Suite extends ScalaCheckSuite:
@@ -15,11 +14,11 @@ class Day10Suite extends ScalaCheckSuite:
   test("parsing smallInput1"):
     val expected = Field(rows =
       Vector(
-        Vector(Horizontal, NorthAndEast, Vertical, SouthAndEast, SouthAndWest).map(Pipe.apply),
-        Vector(Pipe(SouthAndWest), Start, Pipe(Horizontal), Pipe(SouthAndWest), Pipe(Vertical)),
-        Vector(NorthAndEast, Vertical, SouthAndWest, Vertical, Vertical).map(Pipe.apply),
-        Vector(Horizontal, NorthAndEast, Horizontal, NorthAndWest, Vertical).map(Pipe.apply),
-        Vector(NorthAndEast, Vertical, Horizontal, NorthAndWest, SouthAndEast).map(Pipe.apply)
+        Vector(WestAndEast, NorthAndEast, NorthAndSouth, SouthAndEast, SouthAndWest).map(Pipe.apply),
+        Vector(Pipe(SouthAndWest), Start, Pipe(WestAndEast), Pipe(SouthAndWest), Pipe(NorthAndSouth)),
+        Vector(NorthAndEast, NorthAndSouth, SouthAndWest, NorthAndSouth, NorthAndSouth).map(Pipe.apply),
+        Vector(WestAndEast, NorthAndEast, WestAndEast, NorthAndWest, NorthAndSouth).map(Pipe.apply),
+        Vector(NorthAndEast, NorthAndSouth, WestAndEast, NorthAndWest, SouthAndEast).map(Pipe.apply)
       )
     )
     assertEquals(Field.parse(smallInput1), Some(expected))
@@ -28,9 +27,9 @@ class Day10Suite extends ScalaCheckSuite:
     val expected = Field(rows =
       Vector(
         Vector.fill(5)(Ground),
-        Vector(Ground, Start, Pipe(Horizontal), Pipe(SouthAndWest), Ground),
-        Vector(Ground, Pipe(Vertical), Ground, Pipe(Vertical), Ground),
-        Vector(Ground, Pipe(NorthAndEast), Pipe(Horizontal), Pipe(NorthAndWest), Ground),
+        Vector(Ground, Start, Pipe(WestAndEast), Pipe(SouthAndWest), Ground),
+        Vector(Ground, Pipe(NorthAndSouth), Ground, Pipe(NorthAndSouth), Ground),
+        Vector(Ground, Pipe(NorthAndEast), Pipe(WestAndEast), Pipe(NorthAndWest), Ground),
         Vector.fill(5)(Ground)
       )
     )
@@ -183,6 +182,7 @@ class Day10Suite extends ScalaCheckSuite:
     forAll(posGen)(p => assertEquals(p.cardinalDirectionOf(p.north.east), None))
 
   property("inversions to East are empty when loop is NOT in the row, from any column and for any row"):
+    import TileRawType.*
     val n = 10
     forAll(
       Gen.zip(
@@ -195,32 +195,33 @@ class Day10Suite extends ScalaCheckSuite:
     }
 
   test(
-    "inversions to East are [Straight, NorthToSouth, Straight, SouthToNorth]" +
+    "inversions to East are [Vertical, NorthToSouth, Vertical, SouthToNorth]" +
       " for row with loop \"..|..LS7|.F--J.\", 'S' as '-', from leftmost column"
   ):
+    import TileRawType.*
     assertEquals(
       Field.inversionsToEast(
         fromCol = 0,
-        startAs = Horizontal,
+        startAs = WestAndEast,
         row = Vector(
           (Ground, NotOnLoop),
           (Ground, NotOnLoop),
-          (Pipe(Vertical), OnLoop),
+          (Pipe(NorthAndSouth), OnLoop),
           (Ground, NotOnLoop),
           (Ground, NotOnLoop),
           (Pipe(NorthAndEast), OnLoop),
           (Start, OnLoop),
           (Pipe(SouthAndWest), OnLoop),
-          (Pipe(Vertical), OnLoop),
+          (Pipe(NorthAndSouth), OnLoop),
           (Ground, NotOnLoop),
           (Pipe(SouthAndEast), OnLoop),
-          (Pipe(Horizontal), OnLoop),
-          (Pipe(Horizontal), OnLoop),
+          (Pipe(WestAndEast), OnLoop),
+          (Pipe(WestAndEast), OnLoop),
           (Pipe(NorthAndWest), OnLoop),
           (Ground, NotOnLoop)
         )
       ),
-      List(Straight, NorthToSouth, Straight, SouthToNorth)
+      List(Vertical, NorthToSouth, Vertical, SouthToNorth)
     )
 
   test("Field from smallInput3 has 4 tiles inside the loop"):

@@ -14,12 +14,12 @@ object Day10:
     case North, South, West, East
 
   enum PipeType:
-    case Vertical, Horizontal, NorthAndWest, NorthAndEast, SouthAndWest, SouthAndEast
+    case NorthAndSouth, WestAndEast, NorthAndWest, NorthAndEast, SouthAndWest, SouthAndEast
 
   object PipeType:
     def parse(c: Char): Option[PipeType] = c match
-      case '|' => Some(Vertical)
-      case '-' => Some(Horizontal)
+      case '|' => Some(NorthAndSouth)
+      case '-' => Some(WestAndEast)
       case 'J' => Some(NorthAndWest)
       case 'L' => Some(NorthAndEast)
       case '7' => Some(SouthAndWest)
@@ -29,12 +29,12 @@ object Day10:
   case class CandidateConnections(north: Option[Pos], south: Option[Pos], west: Option[Pos], east: Option[Pos])
   object CandidateConnections:
     def parse(pipeType: PipeType, pos: Pos): CandidateConnections = pipeType match
-      case Vertical     => CandidateConnections(Some(pos.north), Some(pos.south), west = None, east = None)
-      case Horizontal   => CandidateConnections(north = None, south = None, Some(pos.west), Some(pos.east))
-      case NorthAndWest => CandidateConnections(Some(pos.north), south = None, Some(pos.west), east = None)
-      case NorthAndEast => CandidateConnections(Some(pos.north), south = None, west = None, Some(pos.east))
-      case SouthAndWest => CandidateConnections(north = None, Some(pos.south), Some(pos.west), east = None)
-      case SouthAndEast => CandidateConnections(north = None, Some(pos.south), west = None, Some(pos.east))
+      case NorthAndSouth => CandidateConnections(Some(pos.north), Some(pos.south), west = None, east = None)
+      case WestAndEast   => CandidateConnections(north = None, south = None, Some(pos.west), Some(pos.east))
+      case NorthAndWest  => CandidateConnections(Some(pos.north), south = None, Some(pos.west), east = None)
+      case NorthAndEast  => CandidateConnections(Some(pos.north), south = None, west = None, Some(pos.east))
+      case SouthAndWest  => CandidateConnections(north = None, Some(pos.south), Some(pos.west), east = None)
+      case SouthAndEast  => CandidateConnections(north = None, Some(pos.south), west = None, Some(pos.east))
 
   case class Pos(row: Int, col: Int):
     lazy val north: Pos = Pos(row - 1, col)
@@ -43,10 +43,10 @@ object Day10:
     lazy val east: Pos = Pos(row, col + 1)
 
     def cardinalDirectionOf(that: Pos): Option[CardinalDirection] =
-      if (that == north) Some(North)
-      else if (that == south) Some(South)
-      else if (that == west) Some(West)
-      else if (that == east) Some(East)
+      if (north == that) Some(North)
+      else if (south == that) Some(South)
+      else if (west == that) Some(West)
+      else if (east == that) Some(East)
       else None
 
   object Pos:
@@ -70,16 +70,18 @@ object Day10:
 
     lazy val startAs: Option[PipeType] =
       def nextCardinalDirection(path: NonEmptyList[Pos]): Option[CardinalDirection] =
-        val s = firstPath.head
-        path.tail.headOption.flatMap(s.cardinalDirectionOf)
+        path.tail.headOption.flatMap(firstPath.head.cardinalDirectionOf)
 
-      (nextCardinalDirection(firstPath), nextCardinalDirection(secondPath)).flatMapN {
-        case (North, South) | (South, North) => Some(Vertical)
+      (
+        nextCardinalDirection(firstPath),
+        nextCardinalDirection(secondPath)
+      ).flatMapN {
+        case (North, South) | (South, North) => Some(NorthAndSouth)
         case (North, West) | (West, North)   => Some(NorthAndWest)
         case (North, East) | (East, North)   => Some(NorthAndEast)
         case (South, West) | (West, South)   => Some(SouthAndWest)
         case (South, East) | (East, South)   => Some(SouthAndEast)
-        case (West, East) | (East, West)     => Some(Horizontal)
+        case (West, East) | (East, West)     => Some(WestAndEast)
         case _                               => None
       }
 
@@ -90,7 +92,7 @@ object Day10:
     case InsideLoop, OutsideLoop, OnLoop
 
   enum Inversion:
-    case Straight, NorthToSouth, SouthToNorth
+    case Vertical, NorthToSouth, SouthToNorth
 
   case class Field(rows: Vector[Vector[Tile]]):
     def startPos: Option[Pos] =
@@ -119,22 +121,22 @@ object Day10:
       ).mapFilter(identity).toSet
 
     def oneStepNorthOfStart(pos: Pos): Option[Pos] = get(pos.north).collect {
-      case t @ Pipe(Vertical)     => t
-      case t @ Pipe(SouthAndWest) => t
-      case t @ Pipe(SouthAndEast) => t
+      case t @ Pipe(NorthAndSouth) => t
+      case t @ Pipe(SouthAndWest)  => t
+      case t @ Pipe(SouthAndEast)  => t
     }.map(_ => pos.north)
     def oneStepSouthOfStart(pos: Pos): Option[Pos] = get(pos.south).collect {
-      case t @ Pipe(Vertical)     => t
-      case t @ Pipe(NorthAndWest) => t
-      case t @ Pipe(NorthAndEast) => t
+      case t @ Pipe(NorthAndSouth) => t
+      case t @ Pipe(NorthAndWest)  => t
+      case t @ Pipe(NorthAndEast)  => t
     }.map(_ => pos.south)
     def oneStepWestOfStart(pos: Pos): Option[Pos] = get(pos.west).collect {
-      case t @ Pipe(Horizontal)   => t
+      case t @ Pipe(WestAndEast)  => t
       case t @ Pipe(NorthAndEast) => t
       case t @ Pipe(SouthAndEast) => t
     }.map(_ => pos.west)
     def oneStepEastOfStart(pos: Pos): Option[Pos] = get(pos.east).collect {
-      case t @ Pipe(Horizontal)   => t
+      case t @ Pipe(WestAndEast)  => t
       case t @ Pipe(NorthAndWest) => t
       case t @ Pipe(SouthAndWest) => t
     }.map(_ => pos.east)
@@ -144,12 +146,12 @@ object Day10:
         optPs.toList.mapFilter(optP => optP.flatMap(p => get(p).map(_ => p))).toSet
       val cc = CandidateConnections.parse(pipeType, pos)
       pipeType match
-        case Vertical     => validTiles(cc.north, cc.south)
-        case Horizontal   => validTiles(cc.west, cc.east)
-        case NorthAndWest => validTiles(cc.north, cc.west)
-        case NorthAndEast => validTiles(cc.north, cc.east)
-        case SouthAndWest => validTiles(cc.south, cc.west)
-        case SouthAndEast => validTiles(cc.south, cc.east)
+        case NorthAndSouth => validTiles(cc.north, cc.south)
+        case WestAndEast   => validTiles(cc.west, cc.east)
+        case NorthAndWest  => validTiles(cc.north, cc.west)
+        case NorthAndEast  => validTiles(cc.north, cc.east)
+        case SouthAndWest  => validTiles(cc.south, cc.west)
+        case SouthAndEast  => validTiles(cc.south, cc.east)
 
     lazy val loop: Option[Loop] = for {
       s <- startPos
@@ -192,7 +194,8 @@ object Day10:
       .map(r => Range(start = 0, end = rows(r).length).map(c => Pos(r, c)).toVector)
 
     def tileTypeAt(l: Loop, startAs: PipeType, pos: Pos): TileType =
-      if (l.allPositions.contains(pos)) TileType.OnLoop
+      import TileType.*
+      if (l.allPositions.contains(pos)) OnLoop
       else
         val row = rows(pos.row).zipWithIndex.map { (tile, col) =>
           import TileRawType.*
@@ -201,7 +204,7 @@ object Day10:
         }
         val inversionsCount = inversionsToEast(fromCol = pos.col, startAs, row).length
         val isEven: Int => Boolean = _ % 2 == 0
-        if (isEven(inversionsCount)) TileType.OutsideLoop else TileType.InsideLoop
+        if (isEven(inversionsCount)) OutsideLoop else InsideLoop
 
   object Field:
     def parse(input: List[String]): Option[Field] =
@@ -211,28 +214,29 @@ object Day10:
       row
         .drop(fromCol)
         .mapFilter { (tile, tileRawType) =>
+          import TileRawType.*
           tileRawType match
-            case TileRawType.OnLoop    => Some(tile)
-            case TileRawType.NotOnLoop => None
+            case OnLoop    => Some(tile)
+            case NotOnLoop => None
         }
         .mapFilter {
-          case Ground | Pipe(Horizontal) => None
-          case Start                     => Some(startAs)
-          case Pipe(pipeType)            => Some(pipeType)
+          case Ground | Pipe(WestAndEast) => None
+          case Start                      => Some(startAs)
+          case Pipe(pipeType)             => Some(pipeType)
         }
         .foldLeft[(List[Inversion], Option[PipeType])]((List.empty, None)) { case ((acc, open), pipeType) =>
           pipeType match
-            case Vertical /* | */                            => (acc :+ Straight, None)
-            case Horizontal /* - */                          => (acc, open)
-            case NorthAndEast /* L */ | SouthAndEast /* F */ => (acc, Some(pipeType))
-            case NorthAndWest /* J */ =>
+            case NorthAndSouth               => (acc :+ Vertical, None)
+            case WestAndEast                 => (acc, open)
+            case NorthAndEast | SouthAndEast => (acc, Some(pipeType))
+            case NorthAndWest =>
               open match
-                case Some(SouthAndEast) /* F */ => (acc :+ SouthToNorth, None)
-                case _                          => (acc, None)
-            case SouthAndWest /* 7 */ =>
+                case Some(SouthAndEast) => (acc :+ SouthToNorth, None)
+                case _                  => (acc, None)
+            case SouthAndWest =>
               open match
-                case Some(NorthAndEast) /* L */ => (acc :+ NorthToSouth, None)
-                case _                          => (acc, None)
+                case Some(NorthAndEast) => (acc :+ NorthToSouth, None)
+                case _                  => (acc, None)
         }
         ._1
 
@@ -240,8 +244,9 @@ object Day10:
     Field.parse(input).flatMap(_.loop.map(_.firstPath.length - 1))
 
   def countTilesInsideLoop(input: List[String]): Option[Int] =
+    import TileType.*
     for {
       field <- Field.parse(input)
       loop <- field.loop
       startAs <- loop.startAs
-    } yield field.allTileTypes(loop, startAs).map(_.count(_ == TileType.InsideLoop)).sum
+    } yield field.allTileTypes(loop, startAs).map(_.count(_ == InsideLoop)).sum
