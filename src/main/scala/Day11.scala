@@ -9,9 +9,11 @@ import Day11.Pixel.*
 
 object Day11:
 
-  case class Pos(row: Int, col: Int)
+  case class Pos(row: Int, col: Int):
+    def manhattanDistanceTo(that: Pos): Int = Math.abs(row - that.row) + Math.abs(col - that.col)
 
   case class NonEmptyMatrix[A](rows: NonEmptyList[NonEmptyList[A]]) derives Functor, Foldable:
+
     lazy val rotatedCW: NonEmptyMatrix[A] = transposed.vFlipped
     lazy val rotatedCCW: NonEmptyMatrix[A] = transposed.hFlipped
     lazy val transposed: NonEmptyMatrix[A] = NonEmptyMatrix(transpose(rows))
@@ -25,6 +27,7 @@ object Day11:
     def collect[B](pf: PartialFunction[A, B]): List[B] = this.toList.collect(pf)
 
   object NonEmptyMatrix:
+
     def transpose[A](rows: NonEmptyList[NonEmptyList[A]]): NonEmptyList[NonEmptyList[A]] =
       def heads(rows: NonEmptyList[NonEmptyList[A]]): NonEmptyList[A] = rows.map(_.head)
       def tails(rows: NonEmptyList[NonEmptyList[A]]): List[List[A]] = rows.toList.map(_.tail)
@@ -59,6 +62,8 @@ object Day11:
       val expandedRowsAndColumns = duplicateAllEmptySpaceRows(expandedRows.rotatedCW).rotatedCCW
       Image(expandedRowsAndColumns)
 
+    lazy val allGalaxies: Set[Pos] = pixels.zipWithPos.collect { case (Galaxy, pos) => pos }.toSet
+
   object Image:
 
     def apply(rows: NonEmptyList[NonEmptyList[Pixel]]): Image = Image(pixels = NonEmptyMatrix(rows))
@@ -75,3 +80,6 @@ object Day11:
     def duplicateAllEmptySpaceRows(ps: NonEmptyMatrix[Pixel]): NonEmptyMatrix[Pixel] = NonEmptyMatrix(
       rows = ps.rows.flatMap(r => if (r.forall(_ == EmptySpace)) NonEmptyList.of(r, r) else NonEmptyList.one(r))
     )
+
+  def allUniquePairs[A](as: Set[A]): Set[(A, A)] =
+    as.toList.combinations(2).collect { case a1 :: a2 :: Nil => (a1, a2) }.toSet

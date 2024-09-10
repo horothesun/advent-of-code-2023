@@ -9,15 +9,14 @@ import Day11Suite.*
 class Day11Suite extends ScalaCheckSuite:
 
   test("non-empty matrix clockwise rotation"):
-    val m = NonEmptyMatrix(
-      rows = NonEmptyList.of(
-        NonEmptyList.of(1, 2),
-        NonEmptyList.of(3, 4),
-        NonEmptyList.of(5, 6)
-      )
-    )
     assertEquals(
-      m.rotatedCW,
+      NonEmptyMatrix(
+        rows = NonEmptyList.of(
+          NonEmptyList.of(1, 2),
+          NonEmptyList.of(3, 4),
+          NonEmptyList.of(5, 6)
+        )
+      ).rotatedCW,
       NonEmptyMatrix(
         rows = NonEmptyList.of(
           NonEmptyList.of(5, 3, 1),
@@ -77,6 +76,30 @@ class Day11Suite extends ScalaCheckSuite:
   test("expanded small input 1"):
     assertEquals(Image.parse(smallInput1).map(_.expanded), Image.parse(expandedSmallInput1))
 
+  test("all galaxies positions for really small image"):
+    val image = Image(
+      rows = NonEmptyList.of(
+        NonEmptyList.of(EmptySpace, Galaxy, EmptySpace),
+        NonEmptyList.of(EmptySpace, EmptySpace, EmptySpace),
+        NonEmptyList.of(EmptySpace, EmptySpace, Galaxy)
+      )
+    )
+    assertEquals(image.allGalaxies, Set(Pos(0, 1), Pos(2, 2)))
+
+  test("all unique pairs"):
+    assertEquals(
+      allUniquePairs(Set(1, 2, 3, 4)),
+      Set((1, 2), (1, 3), (1, 4), (2, 3), (2, 4), (3, 4))
+    )
+
+  test("Manhattan distance between Pos(0,1) and Pos(2,2) is 3"):
+    assertEquals(Pos(0, 1).manhattanDistanceTo(Pos(2, 2)), 3)
+
+  property("Manhattan distances p1->p2 and p2->p1 are the same for any p1, p2: Pos"):
+    forAll(posGen, posGen) { (p1, p2) =>
+      assertEquals(p1.manhattanDistanceTo(p2), p2.manhattanDistanceTo(p1))
+    }
+
 object Day11Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day11_input.txt")
@@ -115,3 +138,5 @@ object Day11Suite:
 
   def nonEmptyListGen[A](aGen: Gen[A], length: Int): Gen[NonEmptyList[A]] =
     Gen.zip(aGen, Gen.listOfN(length - 1, aGen)).map(NonEmptyList.apply)
+
+  def posGen: Gen[Pos] = Gen.zip(Gen.posNum[Int], Gen.posNum[Int]).map(Pos.apply)
