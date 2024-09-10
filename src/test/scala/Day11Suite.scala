@@ -95,10 +95,34 @@ class Day11Suite extends ScalaCheckSuite:
   test("Manhattan distance between Pos(0,1) and Pos(2,2) is 3"):
     assertEquals(Pos(0, 1).manhattanDistanceTo(Pos(2, 2)), 3)
 
+  test("Manhattan distance between Pos(6,1) and Pos(11,5) is 9"):
+    assertEquals(Pos(6, 1).manhattanDistanceTo(Pos(11, 5)), 9)
+
+  test("Manhattan distance between Pos(0,4) and Pos(10,9) is 15"):
+    assertEquals(Pos(0, 4).manhattanDistanceTo(Pos(10, 9)), 15)
+
+  test("Manhattan distance between Pos(2,0) and Pos(7,12) is 17"):
+    assertEquals(Pos(2, 0).manhattanDistanceTo(Pos(7, 12)), 17)
+
+  test("Manhattan distance between Pos(11,0) and Pos(11,5) is 5"):
+    assertEquals(Pos(11, 0).manhattanDistanceTo(Pos(11, 5)), 5)
+
   property("Manhattan distances p1->p2 and p2->p1 are the same for any p1, p2: Pos"):
     forAll(posGen, posGen) { (p1, p2) =>
       assertEquals(p1.manhattanDistanceTo(p2), p2.manhattanDistanceTo(p1))
     }
+
+  test("total number of galaxy pairs for small input 1 is 36"):
+    assertEquals(
+      Image.parse(smallInput1).map(image => allUniquePairs(image.expanded.allGalaxies).size),
+      Some(36)
+    )
+
+  test("sum all unique distances between galaxies on small input 1 is 374"):
+    assertEquals(sumAllUniqueDistancesBetweenGalaxies(smallInput1), Some(374L))
+
+  test("sum all unique distances between galaxies on big input is 9_550_717"):
+    assertEquals(sumAllUniqueDistancesBetweenGalaxies(bigInput), Some(9_550_717L))
 
 object Day11Suite:
 

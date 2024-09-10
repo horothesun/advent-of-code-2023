@@ -83,3 +83,7 @@ object Day11:
 
   def allUniquePairs[A](as: Set[A]): Set[(A, A)] =
     as.toList.combinations(2).collect { case a1 :: a2 :: Nil => (a1, a2) }.toSet
+
+  def sumAllUniqueDistancesBetweenGalaxies(input: List[String]): Option[Long] = Image.parse(input).map { image =>
+    allUniquePairs(image.expanded.allGalaxies).toList.map((p1, p2) => p1.manhattanDistanceTo(p2)).sum
+  }
