@@ -93,6 +93,8 @@ object Day11:
 
   case class Image(pixels: NonEmptyMatrix[Pixel]):
 
+    lazy val rotatedCCW: Image = Image(pixels.rotatedCCW)
+
     def expanded: Image =
       val expandedRows = duplicateAllEmptySpaceRows(pixels)
       val expandedRowsAndColumns = duplicateAllEmptySpaceRows(expandedRows.rotatedCW).rotatedCCW
@@ -101,7 +103,7 @@ object Day11:
     lazy val allGalaxies: Set[Pos] = pixels.zipWithPos.collect { case (Galaxy, pos) => pos }.toSet
 
     lazy val stretches: NonEmptyMatrix[Stretch] = hSpaces.zip(vSpaces).map(Stretch.apply)
-    lazy val hSpaces: NonEmptyMatrix[Space] = Image(pixels.rotatedCCW).vSpaces.rotatedCW
+    lazy val hSpaces: NonEmptyMatrix[Space] = rotatedCCW.vSpaces.rotatedCW
     lazy val vSpaces: NonEmptyMatrix[Space] = NonEmptyMatrix(
       pixels.rows.map { r =>
         val space = if (r.forall(_ == EmptySpace)) Expanded else Normal
@@ -137,16 +139,16 @@ object Day11:
 
   def manhattanDistance(factor: Int, ss: NonEmptyMatrix[Stretch], src: Pos, dest: Pos): Option[Long] =
     ss.focused(src, dest).map { f =>
-      val h = f.topRow.map(_.horizontal.toInt(factor).toLong)
-      val v = f.leftCol.map(_.vertical.toInt(factor).toLong)
-      (h.tail ++ v.tail).sum
+      val hs = f.topRow.map(_.horizontal.toInt(factor).toLong).tail
+      val vs = f.leftCol.map(_.vertical.toInt(factor).toLong).tail
+      (hs ++ vs).sum
     }
 
   def sumAllUniqueDistancesBetweenGalaxies(factor: Int, input: List[String]): Option[Long] =
     for {
       image <- Image.parse(input)
       allDistances <-
-        allUniquePairs(image.allGalaxies).toList.traverse((p1, p2) =>
-          manhattanDistance(factor, image.stretches, src = p1, dest = p2)
+        allUniquePairs(image.allGalaxies).toList.traverse((src, dest) =>
+          manhattanDistance(factor, image.stretches, src, dest)
         )
     } yield allDistances.sum
