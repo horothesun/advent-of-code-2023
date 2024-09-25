@@ -4,24 +4,41 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop.*
 import Day11.*
 import Day11.Pixel.*
+import Day11.Space.*
 import Day11Suite.*
 
 class Day11Suite extends ScalaCheckSuite:
 
+  test("non-empty matrix top row"):
+    assertEquals(
+      NonEmptyMatrix(
+        NonEmptyList.of(1, 2),
+        NonEmptyList.of(3, 4),
+        NonEmptyList.of(5, 6)
+      ).topRow,
+      NonEmptyList.of(1, 2)
+    )
+
+  test("non-empty matrix left column"):
+    assertEquals(
+      NonEmptyMatrix(
+        NonEmptyList.of(1, 2),
+        NonEmptyList.of(3, 4),
+        NonEmptyList.of(5, 6)
+      ).leftCol,
+      NonEmptyList.of(1, 3, 5)
+    )
+
   test("non-empty matrix clockwise rotation"):
     assertEquals(
       NonEmptyMatrix(
-        rows = NonEmptyList.of(
-          NonEmptyList.of(1, 2),
-          NonEmptyList.of(3, 4),
-          NonEmptyList.of(5, 6)
-        )
+        NonEmptyList.of(1, 2),
+        NonEmptyList.of(3, 4),
+        NonEmptyList.of(5, 6)
       ).rotatedCW,
       NonEmptyMatrix(
-        rows = NonEmptyList.of(
-          NonEmptyList.of(5, 3, 1),
-          NonEmptyList.of(6, 4, 2)
-        )
+        NonEmptyList.of(5, 3, 1),
+        NonEmptyList.of(6, 4, 2)
       )
     )
 
@@ -40,18 +57,89 @@ class Day11Suite extends ScalaCheckSuite:
   test("non-empty matrix zip-with-position"):
     assertEquals(
       NonEmptyMatrix(
-        rows = NonEmptyList.of(
-          NonEmptyList.of('a', 'b', 'c'),
-          NonEmptyList.of('d', 'e', 'f')
-        )
+        NonEmptyList.of('a', 'b', 'c'),
+        NonEmptyList.of('d', 'e', 'f')
       ).zipWithPos,
       NonEmptyMatrix(
-        rows = NonEmptyList.of(
-          NonEmptyList.of(('a', Pos(0, 0)), ('b', Pos(0, 1)), ('c', Pos(0, 2))),
-          NonEmptyList.of(('d', Pos(1, 0)), ('e', Pos(1, 1)), ('f', Pos(1, 2)))
+        NonEmptyList.of(('a', Pos(0, 0)), ('b', Pos(0, 1)), ('c', Pos(0, 2))),
+        NonEmptyList.of(('d', Pos(1, 0)), ('e', Pos(1, 1)), ('f', Pos(1, 2)))
+      )
+    )
+
+  test("non-empty matrix 3x2 zip 3x2"):
+    val m1 = NonEmptyMatrix(
+      NonEmptyList.of(1, 2),
+      NonEmptyList.of(3, 4),
+      NonEmptyList.of(5, 6)
+    )
+    val m2 = NonEmptyMatrix(
+      NonEmptyList.of('a', 'b'),
+      NonEmptyList.of('c', 'd'),
+      NonEmptyList.of('e', 'f')
+    )
+    assertEquals(
+      m1.zip(m2),
+      NonEmptyMatrix(
+        NonEmptyList.of((1, 'a'), (2, 'b')),
+        NonEmptyList.of((3, 'c'), (4, 'd')),
+        NonEmptyList.of((5, 'e'), (6, 'f'))
+      )
+    )
+
+  test("non-empty matrix focused mid-to-bottom 2x2"):
+    assertEquals(
+      NonEmptyMatrix(
+        NonEmptyList.of('a', 'b', 'c'),
+        NonEmptyList.of('d', 'e', 'f'),
+        NonEmptyList.of('g', 'h', 'i')
+      ).focused(Pos(1, 1), Pos(2, 2)),
+      Some(
+        NonEmptyMatrix(
+          NonEmptyList.of('e', 'f'),
+          NonEmptyList.of('h', 'i')
         )
       )
     )
+
+  test("non-empty matrix focused mid-to-bottom 2x1"):
+    assertEquals(
+      NonEmptyMatrix(
+        NonEmptyList.of('a', 'b', 'c'),
+        NonEmptyList.of('d', 'e', 'f'),
+        NonEmptyList.of('g', 'h', 'i')
+      ).focused(Pos(1, 1), Pos(2, 1)),
+      Some(
+        NonEmptyMatrix(
+          NonEmptyList.of('e'),
+          NonEmptyList.of('h')
+        )
+      )
+    )
+
+  test("non-empty matrix focused top-to-mid 2x2"):
+    assertEquals(
+      NonEmptyMatrix(
+        NonEmptyList.of('a', 'b', 'c'),
+        NonEmptyList.of('d', 'e', 'f'),
+        NonEmptyList.of('g', 'h', 'i')
+      ).focused(Pos(0, 0), Pos(1, 1)),
+      Some(
+        NonEmptyMatrix(
+          NonEmptyList.of('a', 'b'),
+          NonEmptyList.of('d', 'e')
+        )
+      )
+    )
+
+  test("non-empty matrix focused from top-left to bottom-right doesn't change"):
+    forAll(nonEmptyMatrixGen(Gen.alphaChar))(m =>
+      assertEquals(m.focused(Pos(0, 0), Pos(m.height - 1, m.width - 1)), Some(m))
+    )
+
+  test("non-empty matrix focused p1->p2 is same as for p2->p1, for any valid p1, p2: Pos"):
+    forAll(nonEmptyMatrixGen(Gen.alphaChar).flatMap(m => Gen.zip(Gen.const(m), posInNemGen(m), posInNemGen(m)))) {
+      (m, p1, p2) => assertEquals(m.focused(p1, p2), m.focused(p2, p1))
+    }
 
   test("parsing really small image successfully"):
     assertEquals(
@@ -124,6 +212,60 @@ class Day11Suite extends ScalaCheckSuite:
   test("sum all unique distances between galaxies on big input is 9_550_717"):
     assertEquals(sumAllUniqueDistancesBetweenGalaxies(bigInput), Some(9_550_717L))
 
+  test("(tiny) image horizontal spaces"):
+    assertEquals(
+      Image
+        .parse(
+          input = List(
+            ".#.",
+            "...",
+            "..#"
+          )
+        )
+        .map(_.hSpaces),
+      Some(
+        NonEmptyMatrix(
+          NonEmptyList.of(Expanded, Normal, Normal),
+          NonEmptyList.of(Expanded, Normal, Normal),
+          NonEmptyList.of(Expanded, Normal, Normal)
+        )
+      )
+    )
+
+  test("(tiny) image vertical spaces"):
+    assertEquals(
+      Image
+        .parse(
+          input = List(
+            ".#.",
+            "...",
+            "..#"
+          )
+        )
+        .map(_.vSpaces),
+      Some(
+        NonEmptyMatrix(
+          NonEmptyList.of(Normal, Normal, Normal),
+          NonEmptyList.of(Expanded, Expanded, Expanded),
+          NonEmptyList.of(Normal, Normal, Normal)
+        )
+      )
+    )
+
+  test("sum all unique distances between galaxies on small input 1 w/ factor 10 is 1030"):
+    assertEquals(sumAllUniqueDistancesBetweenGalaxies(factor = 10, smallInput1), Some(1030L))
+
+  test("sum all unique distances between galaxies on small input 1 w/ factor 100 is 8410"):
+    assertEquals(sumAllUniqueDistancesBetweenGalaxies(factor = 100, smallInput1), Some(8410L))
+
+//  import scala.concurrent.duration.*
+//  override val munitTimeout: Duration = 1.minute
+//  test("sum all unique distances between galaxies on big input w/ factor 1M is 648_458_253_817"):
+//    assertEquals(
+//      sumAllUniqueDistancesBetweenGalaxies(factor = 1_000_000, bigInput),
+//      Some(648_458_253_817L)
+//    )
+
 object Day11Suite:
 
   val bigInput: List[String] = getLinesFromFile("src/test/scala/day11_input.txt")
@@ -164,3 +306,5 @@ object Day11Suite:
     Gen.zip(aGen, Gen.listOfN(length - 1, aGen)).map(NonEmptyList.apply)
 
   def posGen: Gen[Pos] = Gen.zip(Gen.posNum[Int], Gen.posNum[Int]).map(Pos.apply)
+  def posInNemGen[A](nem: NonEmptyMatrix[A]): Gen[Pos] =
+    Gen.zip(Gen.choose(0, nem.height - 1), Gen.choose(0, nem.width - 1)).map(Pos.apply)

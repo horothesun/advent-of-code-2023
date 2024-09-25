@@ -6,6 +6,7 @@ import scala.annotation.tailrec
 import Day11.Image.*
 import Day11.NonEmptyMatrix.*
 import Day11.Pixel.*
+import Day11.Space.*
 
 object Day11:
 
@@ -13,6 +14,12 @@ object Day11:
     def manhattanDistanceTo(that: Pos): Int = Math.abs(row - that.row) + Math.abs(col - that.col)
 
   case class NonEmptyMatrix[A](rows: NonEmptyList[NonEmptyList[A]]) derives Functor, Foldable:
+
+    lazy val width: Int = topRow.length
+    lazy val height: Int = rows.length
+
+    lazy val topRow: NonEmptyList[A] = rows.head
+    lazy val leftCol: NonEmptyList[A] = transposed.topRow
 
     lazy val rotatedCW: NonEmptyMatrix[A] = transposed.vFlipped
     lazy val rotatedCCW: NonEmptyMatrix[A] = transposed.hFlipped
@@ -26,7 +33,27 @@ object Day11:
 
     def collect[B](pf: PartialFunction[A, B]): List[B] = this.toList.collect(pf)
 
+    def zip[B](that: NonEmptyMatrix[B]): NonEmptyMatrix[(A, B)] =
+      NonEmptyMatrix(rows.zip(that.rows).map((r1, r2) => r1.zip(r2)))
+
+    def focused(p1: Pos, p2: Pos): Option[NonEmptyMatrix[A]] =
+      val minRow = Math.min(p1.row, p2.row)
+      val maxRow = Math.max(p1.row, p2.row)
+      val minCol = Math.min(p1.col, p2.col)
+      val maxCol = Math.max(p1.col, p2.col)
+      rows.toList
+        .dropRight(height - 1 - maxRow)
+        .map(_.toList.dropRight(width - 1 - maxCol))
+        .drop(minRow)
+        .map(_.drop(minCol))
+        .traverse(_.toNel)
+        .flatMap(_.toNel)
+        .map(NonEmptyMatrix.apply)
+
   object NonEmptyMatrix:
+
+    def apply[A](head: NonEmptyList[A], tail: NonEmptyList[A]*): NonEmptyMatrix[A] =
+      NonEmptyMatrix(rows = NonEmptyList(head, tail.toList))
 
     def transpose[A](rows: NonEmptyList[NonEmptyList[A]]): NonEmptyList[NonEmptyList[A]] =
       def heads(rows: NonEmptyList[NonEmptyList[A]]): NonEmptyList[A] = rows.map(_.head)
@@ -46,6 +73,15 @@ object Day11:
             aux(newAcc, newRows)
       aux(acc = NonEmptyList.of(heads(rows)), tails(rows))
 
+  case class Stretch(horizontal: Space, vertical: Space)
+
+  enum Space:
+    case Normal, Expanded
+
+    def toInt(factor: Int): Int = this match
+      case Normal   => 1
+      case Expanded => factor
+
   enum Pixel:
     case EmptySpace, Galaxy
   object Pixel:
@@ -63,6 +99,15 @@ object Day11:
       Image(expandedRowsAndColumns)
 
     lazy val allGalaxies: Set[Pos] = pixels.zipWithPos.collect { case (Galaxy, pos) => pos }.toSet
+
+    lazy val stretches: NonEmptyMatrix[Stretch] = hSpaces.zip(vSpaces).map(Stretch.apply)
+    lazy val hSpaces: NonEmptyMatrix[Space] = Image(pixels.rotatedCCW).vSpaces.rotatedCW
+    lazy val vSpaces: NonEmptyMatrix[Space] = NonEmptyMatrix(
+      pixels.rows.map { r =>
+        val space = if (r.forall(_ == EmptySpace)) Expanded else Normal
+        r.map(_ => space)
+      }
+    )
 
   object Image:
 
@@ -89,3 +134,19 @@ object Day11:
       .map((p1, p2) => p1.manhattanDistanceTo(p2))
       .sum
   }
+
+  def manhattanDistance(factor: Int, ss: NonEmptyMatrix[Stretch], src: Pos, dest: Pos): Option[Long] =
+    ss.focused(src, dest).map { f =>
+      val h = f.topRow.map(_.horizontal.toInt(factor).toLong)
+      val v = f.leftCol.map(_.vertical.toInt(factor).toLong)
+      (h.tail ++ v.tail).sum
+    }
+
+  def sumAllUniqueDistancesBetweenGalaxies(factor: Int, input: List[String]): Option[Long] =
+    for {
+      image <- Image.parse(input)
+      allDistances <-
+        allUniquePairs(image.allGalaxies).toList.traverse((p1, p2) =>
+          manhattanDistance(factor, image.stretches, src = p1, dest = p2)
+        )
+    } yield allDistances.sum
