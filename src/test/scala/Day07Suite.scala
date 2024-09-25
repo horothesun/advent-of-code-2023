@@ -1,11 +1,11 @@
 import cats.syntax.all.*
 import munit.ScalaCheckSuite
-import Day7.*
-import Day7.CardLabel.*
-import Day7.HandType.*
-import Day7Suite.*
+import Day07.*
+import Day07.CardLabel.*
+import Day07.HandType.*
+import Day07Suite.*
 
-class Day7Suite extends ScalaCheckSuite:
+class Day07Suite extends ScalaCheckSuite:
 
   // part 1
 
@@ -64,10 +64,10 @@ class Day7Suite extends ScalaCheckSuite:
     assertEquals(Hand.parse("TTT98"), Some(Hand(T, T, T, `9`, `8`)))
 
   test("parse \"32T3K 765\" input line"):
-    assertEquals(Day7.parse("32T3K 765"), Some(Hand(`3`, `2`, T, `3`, K), Bid(765)))
+    assertEquals(Day07.parse("32T3K 765"), Some(Hand(`3`, `2`, T, `3`, K), Bid(765)))
 
   test("big input hands are all distinct"):
-    val distinctHandsCount = Day7.parse(bigInput).map(_.groupBy((h, _) => h).keys.size)
+    val distinctHandsCount = Day07.parse(bigInput).map(_.groupBy((h, _) => h).keys.size)
     assertEquals(distinctHandsCount, Some(bigInput.length))
 
   test("small input total winnings are 6_440"):
@@ -104,9 +104,9 @@ class Day7Suite extends ScalaCheckSuite:
   test("big input total winnings are 248_029_057 (new J rule)"):
     assertEquals(getTotalWinningsJ(bigInput), Some(Win(248_029_057)))
 
-object Day7Suite:
+object Day07Suite:
 
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day7_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day07_input.txt")
 
   val smallInput: List[String] = List(
     "32T3K 765",

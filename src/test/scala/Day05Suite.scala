@@ -1,9 +1,9 @@
 import munit.ScalaCheckSuite
-import Day5.*
-import Day5.CompleteCategoryMappings.*
-import Day5Suite.*
+import Day05.*
+import Day05.CompleteCategoryMappings.*
+import Day05Suite.*
 
-class Day5Suite extends ScalaCheckSuite:
+class Day05Suite extends ScalaCheckSuite:
 
   test("\"50 98 2\" + \"52 50 48\" complete core mapping returns correct values"):
     val completeCoreMapping = getCompleteCoreMapping(
@@ -110,9 +110,9 @@ class Day5Suite extends ScalaCheckSuite:
 //  test("bigInput's min location w/ extended seeds is 46"):
 //    assertEquals(getMinLocationWithExtendedSeeds(bigInput), Some(Location(46)))
 
-object Day5Suite:
+object Day05Suite:
 
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day5_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day05_input.txt")
 
   val smallInput: List[String] = List(
     "seeds: 79 14 55 13",

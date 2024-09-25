@@ -1,8 +1,8 @@
 import munit.ScalaCheckSuite
-import Day3.*
-import Day3Suite.*
+import Day03.*
+import Day03Suite.*
 
-class Day3Suite extends ScalaCheckSuite:
+class Day03Suite extends ScalaCheckSuite:
 
   test("parse(smallInput) returns the correct value"):
     assertEquals(parse(smallInput), Some(smallRows))
@@ -43,9 +43,9 @@ class Day3Suite extends ScalaCheckSuite:
   test("getGearsRatioSum(bigInput) == Some(87_263_515)"):
     assertEquals(getGearsRatioSum(bigInput), Some(87_263_515))
 
-object Day3Suite:
+object Day03Suite:
 
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day3_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day03_input.txt")
 
   val smallInput: List[String] = List(
     "467..114..",

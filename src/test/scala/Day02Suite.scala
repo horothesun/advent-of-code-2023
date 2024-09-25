@@ -1,10 +1,10 @@
 import munit.ScalaCheckSuite
-import Day2.*
-import Day2.Color.*
-import Day2.Validity.*
-import Day2Suite.*
+import Day02.*
+import Day02.Color.*
+import Day02.Validity.*
+import Day02Suite.*
 
-class Day2Suite extends ScalaCheckSuite:
+class Day02Suite extends ScalaCheckSuite:
 
   test("getGames(smallInput) returns correct value"):
     assertEquals(getGames(smallInput), Some(List(game1, game2, game3, game4, game5)))
@@ -51,7 +51,7 @@ class Day2Suite extends ScalaCheckSuite:
   test("getGameFewestCubesPowerSum(bigInput) == Some(58_269)"):
     assertEquals(getGameFewestCubesPowerSum(bigInput), Some(58_269))
 
-object Day2Suite:
+object Day02Suite:
 
   val smallInput: List[String] = List(
     "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green",
@@ -60,7 +60,7 @@ object Day2Suite:
     "Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red",
     "Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green"
   )
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day2_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day02_input.txt")
 
   val game1: Game = Game(
     GameId(1),

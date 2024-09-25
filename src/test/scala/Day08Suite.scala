@@ -1,10 +1,10 @@
 import cats.data.NonEmptyList
 import munit.ScalaCheckSuite
-import Day8.*
-import Day8.Direction.*
-import Day8Suite.*
+import Day08.*
+import Day08.Direction.*
+import Day08Suite.*
 
-class Day8Suite extends ScalaCheckSuite:
+class Day08Suite extends ScalaCheckSuite:
 
   // part 1
 
@@ -55,9 +55,9 @@ class Day8Suite extends ScalaCheckSuite:
 //  test("big input requires ??? steps to reach final node as ghost"):
 //    assertEquals(stepsCountToFinishGhost(bigInput), Some(StepsCount(???)))
 
-object Day8Suite:
+object Day08Suite:
 
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day8_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day08_input.txt")
 
   val smallInput1: List[String] = List(
     "RL",

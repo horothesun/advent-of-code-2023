@@ -1,9 +1,9 @@
 import cats.syntax.all.*
 import cats.Monoid
 import scala.annotation.tailrec
-import Day1.Digit.*
+import Day01.Digit.*
 
-object Day1:
+object Day01:
 
   opaque type AmendedCalibration = String
   object AmendedCalibration:

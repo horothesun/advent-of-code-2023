@@ -1,9 +1,9 @@
 import cats.syntax.all.*
 import cats.Monoid
-import Day2.Color.*
-import Day2.Validity.*
+import Day02.Color.*
+import Day02.Validity.*
 
-object Day2:
+object Day02:
 
   opaque type GameId = Int
   object GameId:

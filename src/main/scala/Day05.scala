@@ -3,7 +3,7 @@ import fs2.{Pure, Stream}
 import scala.annotation.tailrec
 import scala.math.Ordering
 
-object Day5:
+object Day05:
 
   trait Identified:
     def id: Long

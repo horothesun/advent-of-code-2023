@@ -1,10 +1,10 @@
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
-import Day4.*
-import Day4Suite.*
+import Day04.*
+import Day04Suite.*
 
-class Day4Suite extends ScalaCheckSuite:
+class Day04Suite extends ScalaCheckSuite:
 
   test("consecutiveDeduped(List(1, 2, 2, 3, 4, 2, 5), toDedupe = 2) == List(1, 2, 3, 4, 2, 5)"):
     assertEquals(consecutiveDeduped(List(1, 2, 2, 3, 4, 2, 5), toDedupe = 2), List(1, 2, 3, 4, 2, 5))
@@ -120,9 +120,9 @@ class Day4Suite extends ScalaCheckSuite:
   test("bigInput generates a total of 9_924_412 card instances"):
     assertEquals(getTotalCards(bigInput), Some(9_924_412))
 
-object Day4Suite:
+object Day04Suite:
 
-  val bigInput: List[String] = getLinesFromFile("src/test/scala/day4_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day04_input.txt")
 
   val card1: Card = Card(CardId(1), winning = List(41, 48, 83, 86, 17), current = List(83, 86, 6, 31, 17, 9, 48, 53))
   val card2: Card = Card(CardId(2), winning = List(13, 32, 20, 16, 61), current = List(61, 30, 68, 82, 17, 32, 24, 19))

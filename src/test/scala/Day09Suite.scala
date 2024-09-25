@@ -1,10 +1,10 @@
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import munit.ScalaCheckSuite
-import Day9.*
-import Day9Suite.*
+import Day09.*
+import Day09Suite.*
 
-class Day9Suite extends ScalaCheckSuite:
+class Day09Suite extends ScalaCheckSuite:
 
   test("\"0 3 6 9 12 15\" differences are \"3 3 3 3 3\""):
     assertEquals(
@@ -84,7 +84,7 @@ class Day9Suite extends ScalaCheckSuite:
   test("big input all past prediction sum is 925"):
     assertEquals(allPastPredictionsSum(bigInput), Some(925L))
 
-object Day9Suite:
+object Day09Suite:
 
   val smallInput: NonEmptyList[String] = NonEmptyList.of(
     "0 3 6 9 12 15",
@@ -92,4 +92,4 @@ object Day9Suite:
     "10 13 16 21 30 45"
   )
 
-  val bigInput: NonEmptyList[String] = getLinesFromFile("src/test/scala/day9_input.txt").toNel.get
+  val bigInput: NonEmptyList[String] = getLinesFromFile("src/test/scala/day09_input.txt").toNel.get

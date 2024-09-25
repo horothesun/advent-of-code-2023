@@ -3,9 +3,9 @@ import cats.syntax.all.*
 import cats.Order
 import fs2.{Pure, Stream}
 import scala.util.Try
-import Day8.Direction.*
+import Day08.Direction.*
 
-object Day8:
+object Day08:
 
   // part 1
 

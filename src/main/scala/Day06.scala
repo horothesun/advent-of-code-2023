@@ -1,10 +1,10 @@
 import cats.syntax.all.*
 import scala.math.Ordering.Implicits.infixOrderingOps
 import scala.math.Numeric.Implicits.infixNumericOps
-import Day6.*
-import Day6.RaceOutcome.*
+import Day06.*
+import Day06.RaceOutcome.*
 
-object Day6:
+object Day06:
 
   case class Time(millis: Long):
     def inc: Time = Time(millis + 1)

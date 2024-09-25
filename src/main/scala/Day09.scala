@@ -1,7 +1,7 @@
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 
-object Day9:
+object Day09:
 
   case class History(values: NonEmptyList[Long])
   object History:

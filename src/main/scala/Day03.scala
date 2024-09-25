@@ -2,7 +2,7 @@ import cats.derived.*
 import cats.syntax.all.*
 import cats.Traverse
 
-object Day3:
+object Day03:
 
   val DOT_CHAR = '.'
 

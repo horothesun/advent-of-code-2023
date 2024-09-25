@@ -2,9 +2,9 @@ import cats.{Order, Semigroup, SemigroupK}
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import scala.util.Try
-import Day7.HandType.*
+import Day07.HandType.*
 
-object Day7:
+object Day07:
 
   opaque type Strength = Int
 

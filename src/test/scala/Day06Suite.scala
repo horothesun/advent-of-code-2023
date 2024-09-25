@@ -1,10 +1,10 @@
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
-import Day6.*
-import Day6Suite.*
+import Day06.*
+import Day06Suite.*
 
-class Day6Suite extends ScalaCheckSuite:
+class Day06Suite extends ScalaCheckSuite:
 
   test("get all possible distances from time allowance"):
     assertEquals(
@@ -58,7 +58,7 @@ class Day6Suite extends ScalaCheckSuite:
     val bigSingleRace = Race(allowance = Time(61_709_066), record = Distance(643_118_413_621_041L))
     assertEquals(countWaysToWin(bigSingleRace), 35_150_181L)
 
-object Day6Suite:
+object Day06Suite:
 
   def raceGen: Gen[Race] = for {
     t <- Gen.choose(min = 0L, max = 500_000L)

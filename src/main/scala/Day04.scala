@@ -1,6 +1,6 @@
 import cats.syntax.all.*
 
-object Day4:
+object Day04:
 
   case class CardId(value: Int)
   object CardId:
