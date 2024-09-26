@@ -45,8 +45,7 @@ object Day11:
         .dropRight(height - 1 - maxRow)
         .map(_.toList.dropRight(width - 1 - maxCol))
         .drop(minRow)
-        .map(_.drop(minCol))
-        .traverse(_.toNel)
+        .traverse(_.drop(minCol).toNel)
         .flatMap(_.toNel)
         .map(NonEmptyMatrix.apply)
 
