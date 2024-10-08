@@ -1,12 +1,12 @@
+import Day11.Image.*
+import Day11.NonEmptyMatrix.*
+import Day11.Pixel.*
+import Day11.Space.*
 import cats.*
 import cats.data.NonEmptyList
 import cats.derived.*
 import cats.syntax.all.*
 import scala.annotation.tailrec
-import Day11.Image.*
-import Day11.NonEmptyMatrix.*
-import Day11.Pixel.*
-import Day11.Space.*
 
 object Day11:
 

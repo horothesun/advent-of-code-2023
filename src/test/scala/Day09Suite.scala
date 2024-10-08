@@ -1,8 +1,8 @@
+import Day09.*
+import Day09Suite.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import munit.ScalaCheckSuite
-import Day09.*
-import Day09Suite.*
 
 class Day09Suite extends ScalaCheckSuite:
 

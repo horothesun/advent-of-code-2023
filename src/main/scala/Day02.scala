@@ -1,7 +1,7 @@
-import cats.syntax.all.*
-import cats.Monoid
 import Day02.Color.*
 import Day02.Validity.*
+import cats.Monoid
+import cats.syntax.all.*
 
 object Day02:
 

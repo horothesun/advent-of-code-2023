@@ -1,8 +1,8 @@
-import cats.syntax.all.*
-import scala.math.Ordering.Implicits.infixOrderingOps
-import scala.math.Numeric.Implicits.infixNumericOps
 import Day06.*
 import Day06.RaceOutcome.*
+import cats.syntax.all.*
+import scala.math.Numeric.Implicits.infixNumericOps
+import scala.math.Ordering.Implicits.infixOrderingOps
 
 object Day06:
 
@@ -82,7 +82,9 @@ object Day06:
     val allLosses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(race))
     totalOutcomes - allLosses
 
-// recursion schemes 🧪🔬
+/*
+  recursion schemes 🧪🔬
+ */
 
 import cats.Eval
 import higherkindness.droste.*

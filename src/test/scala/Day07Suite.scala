@@ -1,9 +1,9 @@
-import cats.syntax.all.*
-import munit.ScalaCheckSuite
 import Day07.*
 import Day07.CardLabel.*
 import Day07.HandType.*
 import Day07Suite.*
+import cats.syntax.all.*
+import munit.ScalaCheckSuite
 
 class Day07Suite extends ScalaCheckSuite:
 

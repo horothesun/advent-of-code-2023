@@ -1,8 +1,8 @@
+import Day04.*
+import Day04Suite.*
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
-import Day04.*
-import Day04Suite.*
 
 class Day04Suite extends ScalaCheckSuite:
 

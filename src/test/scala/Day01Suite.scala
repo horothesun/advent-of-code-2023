@@ -1,7 +1,7 @@
-import munit.ScalaCheckSuite
 import Day01.*
 import Day01.Digit.*
 import Day01Suite.*
+import munit.ScalaCheckSuite
 
 class Day01Suite extends ScalaCheckSuite:
 

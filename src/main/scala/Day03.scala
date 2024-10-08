@@ -1,6 +1,6 @@
+import cats.Traverse
 import cats.derived.*
 import cats.syntax.all.*
-import cats.Traverse
 
 object Day03:
 

@@ -1,8 +1,8 @@
+import Day07.HandType.*
 import cats.{Order, Semigroup, SemigroupK}
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import scala.util.Try
-import Day07.HandType.*
 
 object Day07:
 

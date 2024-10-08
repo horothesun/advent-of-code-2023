@@ -1,8 +1,8 @@
-import cats.data.NonEmptyList
-import munit.ScalaCheckSuite
 import Day08.*
 import Day08.Direction.*
 import Day08Suite.*
+import cats.data.NonEmptyList
+import munit.ScalaCheckSuite
 
 class Day08Suite extends ScalaCheckSuite:
 

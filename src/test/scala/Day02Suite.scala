@@ -1,8 +1,8 @@
-import munit.ScalaCheckSuite
 import Day02.*
 import Day02.Color.*
 import Day02.Validity.*
 import Day02Suite.*
+import munit.ScalaCheckSuite
 
 class Day02Suite extends ScalaCheckSuite:
 

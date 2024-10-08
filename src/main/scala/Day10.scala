@@ -1,12 +1,12 @@
-import cats.data.{NonEmptyList, NonEmptySet}
-import cats.syntax.all.*
-import cats.Order
-import scala.annotation.tailrec
 import Day10.CardinalDirection.*
 import Day10.Field.*
 import Day10.Inversion.*
 import Day10.PipeType.*
 import Day10.Tile.*
+import cats.Order
+import cats.data.{NonEmptyList, NonEmptySet}
+import cats.syntax.all.*
+import scala.annotation.tailrec
 
 object Day10:
 

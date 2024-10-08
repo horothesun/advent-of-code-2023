@@ -1,11 +1,11 @@
-import cats.data.NonEmptyList
-import munit.ScalaCheckSuite
-import org.scalacheck.Gen
-import org.scalacheck.Prop.*
 import Day11.*
 import Day11.Pixel.*
 import Day11.Space.*
 import Day11Suite.*
+import cats.data.NonEmptyList
+import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.*
 
 class Day11Suite extends ScalaCheckSuite:
 

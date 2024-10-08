@@ -1,9 +1,9 @@
+import Day08.Direction.*
+import cats.Order
 import cats.data.NonEmptyList
 import cats.syntax.all.*
-import cats.Order
 import fs2.{Pure, Stream}
 import scala.util.Try
-import Day08.Direction.*
 
 object Day08:
 

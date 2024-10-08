@@ -1,7 +1,7 @@
-import cats.syntax.all.*
-import cats.Monoid
-import scala.annotation.tailrec
 import Day01.Digit.*
+import cats.Monoid
+import cats.syntax.all.*
+import scala.annotation.tailrec
 
 object Day01:
 

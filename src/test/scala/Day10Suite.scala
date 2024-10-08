@@ -1,13 +1,13 @@
-import cats.data.NonEmptyList
-import munit.ScalaCheckSuite
-import org.scalacheck.Gen
-import org.scalacheck.Prop.*
 import Day10.*
 import Day10.CardinalDirection.*
 import Day10.Inversion.*
 import Day10.PipeType.*
 import Day10.Tile.*
 import Day10Suite.*
+import cats.data.NonEmptyList
+import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.*
 
 class Day10Suite extends ScalaCheckSuite:
 
