@@ -1,4 +1,3 @@
-import Day01.Digit.*
 import cats.Monoid
 import cats.syntax.all.*
 import scala.annotation.tailrec
