@@ -3,11 +3,11 @@ import cats.syntax.all.*
 
 object Day12:
 
-  enum Condition:
+  enum RawCondition:
     case Operational, Damaged, Unknown
 
-  object Condition:
-    def parse(c: Char): Option[Condition] = c match
+  object RawCondition:
+    def parse(c: Char): Option[RawCondition] = c match
       case '.' => Some(Operational)
       case '#' => Some(Damaged)
       case '?' => Some(Unknown)
@@ -27,5 +27,15 @@ object Day12:
   object Row:
     def of[A](a: A, as: A*): Row[A] = Row(NonEmptyList(a, as.toList))
 
-  def parseConditionRow(input: String): Option[Row[Condition]] =
-    input.toList.toNel.flatMap(_.traverse(Condition.parse).map(Row.apply))
+  enum Condition:
+    case Operational, Damaged
+
+  def parseRawConditionRow(input: String): Option[Row[RawCondition]] =
+    input.toList.toNel.flatMap(_.traverse(RawCondition.parse).map(Row.apply))
+
+  extension [A](as: List[A])
+    def interleavedLeft(that: List[A]): List[A] =
+      def extendedBy(n: Int, l: List[A]): List[List[A]] = l.map(_ :: Nil) ++ List.fill(Math.max(0, n))(List.empty[A])
+      val fstExt = extendedBy(that.length - as.length, as)
+      val sndExt = extendedBy(as.length - that.length, that)
+      fstExt.zip(sndExt).flatMap((f, s) => f ++ s)
