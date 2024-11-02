@@ -44,8 +44,8 @@ class Day12Suite extends ScalaCheckSuite:
       assertEquals(r.values.length, r.toContiguous.map(_.reps).sumAll)
     }
 
-  test("Condition.valuesNel and Condition.values have same elements"):
-    assertEquals(Condition.valuesNel.toList, Condition.values.toList)
+  test("Condition.valuesNes and Condition.values have same elements"):
+    assertEquals(Condition.valuesNes.toList.sorted, Condition.values.toList.sorted)
 
   test("interleaving List(1,2,3,4) and List(10,20) is List(1,10,2,20,3,4)"):
     assertEquals(
@@ -75,7 +75,7 @@ class Day12Suite extends ScalaCheckSuite:
       assertEquals(List.empty[Char].interleavedLeft(l), l)
     }
 
-  property("interleaving / filtering round-trip"):
+  property("interleaving -> filtering round-trip"):
     forAll(Gen.listOf(Gen.posNum[Int]), Gen.listOf(Gen.negNum[Int])) { (pos, neg) =>
       val interleaved = pos.interleavedLeft(neg)
       assertEquals(interleaved.filter(_ > 0), pos)
@@ -83,7 +83,7 @@ class Day12Suite extends ScalaCheckSuite:
     }
 
   test("all possible Condition combinations of length 20 are 1_048_576"):
-    assertEquals(allCombinationsOf(length = 20, values = Condition.valuesNel).length, 1_048_576)
+    assertEquals(allCombinationsOf(length = 20, values = Condition.valuesNes).length, 1_048_576)
 
   test("damaged group sizes match between #.#.### and 1,1,3"):
     import Condition.*

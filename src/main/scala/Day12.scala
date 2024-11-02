@@ -1,8 +1,9 @@
 import Day12.ConditionsCheck.*
-import cats.Functor
-import cats.data.NonEmptyList
+import cats.{Functor, Order}
+import cats.data.{NonEmptyList, NonEmptySet}
 import cats.derived.*
 import cats.syntax.all.*
+import scala.annotation.tailrec
 
 object Day12:
 
@@ -30,7 +31,7 @@ object Day12:
   object Row:
     def of[A](a: A, as: A*): Row[A] = Row(NonEmptyList(a, as.toList))
 
-  enum Condition:
+  enum Condition derives Order:
     case Operational, Damaged
 
     def toRaw: RawCondition = this match
@@ -38,7 +39,8 @@ object Day12:
       case Condition.Damaged     => RawCondition.Damaged
 
   object Condition:
-    def valuesNel: NonEmptyList[Condition] = values.toList.toNel.get
+    given Ordering[Condition] = Order[Condition].toOrdering
+    def valuesNes: NonEmptySet[Condition] = values.toList.toNel.map(_.toNes).get
 
   case class ConditionRecord(rawConditions: Row[RawCondition], contiguousDamagedGroupSizes: List[Int]):
 
@@ -69,17 +71,20 @@ object Day12:
       val sndExt = extendedBy(as.length - that.length, that)
       fstExt.zip(sndExt).flatMap((f, s) => f ++ s)
 
-  def allCombinationsOf[A](length: Int, values: NonEmptyList[A]): List[NonEmptyList[A]] =
-    // TODO: can this be tail rec?
-    def aux(n: Int): NonEmptyList[NonEmptyList[A]] =
-      if (n == 1) values.map(NonEmptyList.one)
+  def allCombinationsOf[A](length: Int, values: NonEmptySet[A]): List[NonEmptyList[A]] =
+    val valuesList = values.toList
+    @tailrec
+    def aux(n: Int, acc: List[NonEmptyList[A]]): List[NonEmptyList[A]] =
+      if (n == 0) acc
       else
-        val tails = aux(n - 1)
-        for {
-          head <- values
-          tail <- tails
+        // generate the new set of combinations by prepending each value to each combination in acc
+        val newAcc = for {
+          head <- valuesList
+          tail <- acc
         } yield head :: tail
-    if (length <= 0) List.empty else aux(length).toList
+        aux(n - 1, newAcc)
+
+    if (length <= 0) List.empty else aux(length, List(NonEmptyList.one(values.head)))
 
   enum ConditionsCheck:
     case Match, Fail
@@ -91,7 +96,7 @@ object Day12:
   def getAllArrangements(rawConditions: Row[RawCondition]): NonEmptyList[Row[Condition]] =
     val contiguousRawConditions = rawConditions.toContiguous
     val allUnknownsSize = contiguousRawConditions.collect { case Contiguous(RawCondition.Unknown, reps) => reps }.sum
-    val allCombos = allCombinationsOf(length = allUnknownsSize, values = Condition.valuesNel)
+    val allCombos = allCombinationsOf(length = allUnknownsSize, values = Condition.valuesNes)
     allCombos
       .map(combo =>
         val NonEmptyList(crc, crcTail) = contiguousRawConditions
