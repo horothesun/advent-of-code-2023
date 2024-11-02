@@ -3,6 +3,7 @@ import cats.{Functor, Order}
 import cats.data.{NonEmptyList, NonEmptySet}
 import cats.derived.*
 import cats.syntax.all.*
+import fs2.{Pure, Stream}
 import scala.annotation.tailrec
 
 object Day12:
@@ -75,7 +76,7 @@ object Day12:
     val valuesList = values.toList
     @tailrec
     def aux(n: Int, acc: List[NonEmptyList[A]]): List[NonEmptyList[A]] =
-      if (n == 0) acc
+      if (n == 1) acc
       else
         // generate the new set of combinations by prepending each value to each combination in acc
         val newAcc = for {
@@ -84,7 +85,35 @@ object Day12:
         } yield head :: tail
         aux(n - 1, newAcc)
 
-    if (length <= 0) List.empty else aux(length, List(NonEmptyList.one(values.head)))
+    if (length <= 0) List.empty else aux(length, valuesList.map(NonEmptyList.one))
+
+  def allCombinationsOf_rec[A](length: Int, values: NonEmptySet[A]): List[NonEmptyList[A]] =
+    val valuesNel = values.toNonEmptyList
+    def aux(n: Int): NonEmptyList[NonEmptyList[A]] =
+      if (n == 1) valuesNel.map(NonEmptyList.one)
+      else
+        val tails = aux(n - 1)
+        for {
+          head <- valuesNel
+          tail <- tails
+        } yield head :: tail
+
+    if (length <= 0) List.empty else aux(length).toList
+
+  def allCombinationsOf_lzy[A](length: Int, values: NonEmptySet[A]): Stream[Pure, NonEmptyList[A]] =
+    val lzyValues = Stream.emits(values.toList)
+    def aux(n: Int): Stream[Pure, NonEmptyList[A]] =
+      if (n == 1)
+        // for length 1, yield each value as a singleton NonEmptyList
+        lzyValues.map(NonEmptyList.one)
+      else
+        // for length > 1, combine each value with recursively generated tails
+        for {
+          head <- lzyValues
+          tail <- aux(n - 1)
+        } yield head :: tail
+
+    if (length <= 0) Stream.empty else aux(length)
 
   enum ConditionsCheck:
     case Match, Fail

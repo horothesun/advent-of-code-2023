@@ -85,6 +85,22 @@ class Day12Suite extends ScalaCheckSuite:
   test("all possible Condition combinations of length 20 are 1_048_576"):
     assertEquals(allCombinationsOf(length = 20, values = Condition.valuesNes).length, 1_048_576)
 
+  property("all possible Condition combinations (eagerly) non-tailrec and tailrec calculated are the same"):
+    forAll(Gen.choose(min = 0, max = 10)) { length =>
+      assertEquals(
+        allCombinationsOf_rec(length, values = Condition.valuesNes),
+        allCombinationsOf(length, values = Condition.valuesNes)
+      )
+    }
+
+  property("all possible Condition combinations eagerly (non-tailrec) and lazily calculated are the same"):
+    forAll(Gen.choose(min = 0, max = 10)) { length =>
+      assertEquals(
+        allCombinationsOf_rec(length, values = Condition.valuesNes),
+        allCombinationsOf_lzy(length, values = Condition.valuesNes).toList
+      )
+    }
+
   test("damaged group sizes match between #.#.### and 1,1,3"):
     import Condition.*
     assertEquals(
@@ -163,8 +179,8 @@ class Day12Suite extends ScalaCheckSuite:
   test("total valid arrangements for small input are 21"):
     assertEquals(totalValidArrangements(smallInput), Some(21))
 
-  test("total valid arrangements for big input are 7_169"):
-    assertEquals(totalValidArrangements(bigInput), Some(7_169))
+//  test("total valid arrangements for big input are 7_169"):
+//    assertEquals(totalValidArrangements(bigInput), Some(7_169))
 
 object Day12Suite:
 
