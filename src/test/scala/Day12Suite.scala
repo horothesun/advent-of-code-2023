@@ -11,8 +11,20 @@ class Day12Suite extends ScalaCheckSuite:
   test("Row[RawCondition] parsed from \"???.###\""):
     import RawCondition.*
     assertEquals(
-      parseRawConditionRow("???.###"),
+      ConditionRecord.parseRawConditionRow("???.###"),
       Some(Row.of[RawCondition](Unknown, Unknown, Unknown, Operational, Damaged, Damaged, Damaged))
+    )
+
+  test("ConditionRecord parsed from \"???.### 1,1,3\""):
+    import RawCondition.*
+    assertEquals(
+      ConditionRecord.parse("???.### 1,1,3"),
+      Some(
+        ConditionRecord(
+          rawConditions = Row.of[RawCondition](Unknown, Unknown, Unknown, Operational, Damaged, Damaged, Damaged),
+          contiguousDamagedGroupSizes = List(1, 1, 3)
+        )
+      )
     )
 
   test("Row to contiguous groups list example"):
@@ -31,6 +43,9 @@ class Day12Suite extends ScalaCheckSuite:
     forAll(rowGen(Gen.alphaNumChar)) { r =>
       assertEquals(r.values.length, r.toContiguous.map(_.reps).sumAll)
     }
+
+  test("Condition.valuesNel and Condition.values have same elements"):
+    assertEquals(Condition.valuesNel.toList, Condition.values.toList)
 
   test("interleaving List(1,2,3,4) and List(10,20) is List(1,10,2,20,3,4)"):
     assertEquals(
@@ -67,9 +82,104 @@ class Day12Suite extends ScalaCheckSuite:
       assertEquals(interleaved.filter(_ < 0), neg)
     }
 
+  test("all possible Condition combinations of length 20 are 1_048_576"):
+    assertEquals(allCombinationsOf(length = 20, values = Condition.valuesNel).length, 1_048_576)
+
+  test("damaged group sizes match between #.#.### and 1,1,3"):
+    import Condition.*
+    assertEquals(
+      damagedGroupSizesCheck(
+        Row.of[Condition](Damaged, Operational, Damaged, Operational, Damaged, Damaged, Damaged),
+        List(1, 1, 3)
+      ),
+      ConditionsCheck.Match
+    )
+
+  test("damaged group sizes match between .#.###.#.###### and 1,3,1,6"):
+    import Condition.*
+    assertEquals(
+      damagedGroupSizesCheck(
+        Row.of[Condition](
+          Operational,
+          Damaged,
+          Operational,
+          Damaged,
+          Damaged,
+          Damaged,
+          Operational,
+          Damaged,
+          Operational,
+          Damaged,
+          Damaged,
+          Damaged,
+          Damaged,
+          Damaged,
+          Damaged
+        ),
+        List(1, 3, 1, 6)
+      ),
+      ConditionsCheck.Match
+    )
+
+  test("damaged group sizes do NOT match between #.#.#. and 1,1,3"):
+    import Condition.*
+    assertEquals(
+      damagedGroupSizesCheck(
+        Row.of[Condition](Damaged, Operational, Damaged, Operational, Damaged, Operational),
+        List(1, 1, 3)
+      ),
+      ConditionsCheck.Fail
+    )
+
+  property("all arrangements for any fully determined RawCondition are only the original"):
+    forAll(rowGen(conditionGen)) { conditionRow =>
+      val fullyDeterminedRawConditionRow = conditionRow.map(_.toRaw)
+      assertEquals(
+        getAllArrangements(fullyDeterminedRawConditionRow),
+        NonEmptyList.one(conditionRow)
+      )
+    }
+
+  test("all arrangements for #?.??.#"):
+    assertEquals(
+      getAllArrangements {
+        import RawCondition.*
+        Row.of[RawCondition](Damaged, Unknown, Operational, Unknown, Unknown, Operational, Damaged)
+      }, {
+        import Condition.*
+        NonEmptyList.of(
+          Row.of[Condition](Damaged, Operational, Operational, Operational, Operational, Operational, Damaged),
+          Row.of[Condition](Damaged, Operational, Operational, Operational, Damaged, Operational, Damaged),
+          Row.of[Condition](Damaged, Operational, Operational, Damaged, Operational, Operational, Damaged),
+          Row.of[Condition](Damaged, Operational, Operational, Damaged, Damaged, Operational, Damaged),
+          Row.of[Condition](Damaged, Damaged, Operational, Operational, Operational, Operational, Damaged),
+          Row.of[Condition](Damaged, Damaged, Operational, Operational, Damaged, Operational, Damaged),
+          Row.of[Condition](Damaged, Damaged, Operational, Damaged, Operational, Operational, Damaged),
+          Row.of[Condition](Damaged, Damaged, Operational, Damaged, Damaged, Operational, Damaged)
+        )
+      }
+    )
+
+  test("total valid arrangements for small input are 21"):
+    assertEquals(totalValidArrangements(smallInput), Some(21))
+
+  test("total valid arrangements for big input are 7_169"):
+    assertEquals(totalValidArrangements(bigInput), Some(7_169))
+
 object Day12Suite:
 
-//  val bigInput: List[String] = getLinesFromFile("src/test/scala/day12_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day12_input.txt")
+
+  val smallInput: List[String] = List(
+    "???.### 1,1,3",
+    ".??..??...?##. 1,1,3",
+    "?#?#?#?#?#?#?#? 1,3,1,6",
+    "????.#...#... 4,1,1",
+    "????.######..#####. 1,6,5",
+    "?###???????? 3,2,1"
+  )
+
+  def conditionGen: Gen[Condition] = Gen.oneOf(Condition.values.toList)
 
   def rowGen[A](aGen: Gen[A]): Gen[Row[A]] = Gen.posNum[Int].flatMap(rowGen(aGen, _))
   def rowGen[A](aGen: Gen[A], length: Int): Gen[Row[A]] = nonEmptyListGen(aGen, length).map(Row.apply)
