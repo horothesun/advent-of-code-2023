@@ -11,6 +11,12 @@ object Day12:
   enum RawCondition:
     case Operational, Damaged, Unknown
 
+    def toCondition: Option[Condition] = this match {
+      case RawCondition.Operational => Some(Condition.Operational)
+      case RawCondition.Damaged     => Some(Condition.Damaged)
+      case RawCondition.Unknown     => None
+    }
+
   object RawCondition:
     def parse(c: Char): Option[RawCondition] = c match
       case '.' => Some(Operational)
@@ -49,6 +55,12 @@ object Day12:
       damagedGroupSizesCheck(cs, contiguousDamagedGroupSizes) match
         case ConditionsCheck.Match => cs
     }
+
+    def getAllValidArrangements_lzy: Stream[Pure, Row[Condition]] =
+      getAllArrangements_lzy(rawConditions).collect { cs =>
+        damagedGroupSizesCheck(cs, contiguousDamagedGroupSizes) match
+          case ConditionsCheck.Match => cs
+      }
 
   object ConditionRecord:
     def parse(s: String): Option[ConditionRecord] =
@@ -122,26 +134,21 @@ object Day12:
     val damagedReps = conditions.toContiguous.collect { case Contiguous(Condition.Damaged, reps) => reps }
     if (damagedReps == contiguousDamagedGroupSizes) Match else Fail
 
+  def getAllArrangements_lzy(rawConditions: Row[RawCondition]): Stream[Pure, Row[Condition]] =
+    val contiguousRawConditions = rawConditions.toContiguous
+    val allUnknownsSize = contiguousRawConditions.collect { case Contiguous(RawCondition.Unknown, reps) => reps }.sum
+    val allCombos = allCombinationsOf_lzy(length = allUnknownsSize, values = Condition.valuesNes)
+    if (allUnknownsSize == 0) Stream.fromOption(rawConditions.values.traverse(_.toCondition).map(Row.apply))
+    else allCombos.map(hydrate(contiguousRawConditions, _))
+
   def getAllArrangements(rawConditions: Row[RawCondition]): NonEmptyList[Row[Condition]] =
     val contiguousRawConditions = rawConditions.toContiguous
     val allUnknownsSize = contiguousRawConditions.collect { case Contiguous(RawCondition.Unknown, reps) => reps }.sum
     val allCombos = allCombinationsOf(length = allUnknownsSize, values = Condition.valuesNes)
     allCombos
-      .map(combo =>
-        val NonEmptyList(crc, crcTail) = contiguousRawConditions
-        val (firstComboTail, headRes) = newComboTailAndPartialRes(combo.toList, crc)
-        Row(
-          crcTail
-            .foldLeft[(List[Condition], NonEmptyList[Condition])]((firstComboTail, headRes)) {
-              case ((comboTail, acc), c) =>
-                val (newComboTail, newPartRes) = newComboTailAndPartialRes(comboTail, c)
-                (newComboTail, acc.concatNel(newPartRes))
-            }
-            ._2
-        )
-      )
+      .map(hydrate(contiguousRawConditions, _))
       .toNel
-      .getOrElse(toConditionNel(rawConditions.values).map(rc => NonEmptyList.one(Row(rc))).get)
+      .getOrElse(rawConditions.values.traverse(_.toCondition).map(cs => NonEmptyList.one(Row(cs))).get)
 
   def newComboTailAndPartialRes(
     comboTail: List[Condition],
@@ -151,14 +158,25 @@ object Day12:
     case RawCondition.Damaged     => (comboTail, Contiguous[Condition](Condition.Damaged, c.reps).toNel)
     case RawCondition.Unknown     => (comboTail.drop(c.reps), comboTail.take(c.reps).toNel.get)
 
-  def toConditionNel(rawConditions: NonEmptyList[RawCondition]): Option[NonEmptyList[Condition]] =
-    rawConditions.traverse[Option, Condition] {
-      case RawCondition.Operational => Some(Condition.Operational)
-      case RawCondition.Damaged     => Some(Condition.Damaged)
-      case RawCondition.Unknown     => None
-    }
+  def hydrate(
+    contiguousRawConditions: NonEmptyList[Contiguous[RawCondition]],
+    combo: NonEmptyList[Condition]
+  ): Row[Condition] =
+    val NonEmptyList(crc, crcTail) = contiguousRawConditions
+    val (firstComboTail, headRes) = newComboTailAndPartialRes(combo.toList, crc)
+    Row(
+      crcTail
+        .foldLeft[(List[Condition], NonEmptyList[Condition])]((firstComboTail, headRes)) { case ((comboTail, acc), c) =>
+          val (newComboTail, newPartRes) = newComboTailAndPartialRes(comboTail, c)
+          (newComboTail, acc.concatNel(newPartRes))
+        }
+        ._2
+    )
 
   def parse(input: List[String]): Option[List[ConditionRecord]] = input.traverse(ConditionRecord.parse)
 
   def totalValidArrangements(input: List[String]): Option[Int] =
-    parse(input).map(crs => crs.map(_.getAllValidArrangements.length).sum)
+    parse(input).map(_.map(_.getAllValidArrangements.length).sum)
+
+  def totalValidArrangements_lzy(input: List[String]): Option[Int] =
+    parse(input).map(_.map(_.getAllValidArrangements_lzy.map(_ => ()).toList.length).sum)

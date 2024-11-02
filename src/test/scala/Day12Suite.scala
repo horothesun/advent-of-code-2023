@@ -2,6 +2,7 @@ import Day12.*
 import Day12Suite.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
+import fs2.Stream
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
@@ -179,8 +180,31 @@ class Day12Suite extends ScalaCheckSuite:
   test("total valid arrangements for small input are 21"):
     assertEquals(totalValidArrangements(smallInput), Some(21))
 
-//  test("total valid arrangements for big input are 7_169"):
-//    assertEquals(totalValidArrangements(bigInput), Some(7_169))
+  test("total valid arrangements (lazily evaluated) for small input are 21"):
+    assertEquals(totalValidArrangements_lzy(smallInput), Some(21))
+
+  test("total valid arrangements for big input are 7_169"):
+    assertEquals(totalValidArrangements(bigInput), Some(7_169))
+
+//  override val munitTimeout: scala.concurrent.duration.Duration =
+//    import scala.concurrent.duration.{Duration, MINUTES}
+//    Duration(2, MINUTES)
+//
+//  test("total valid arrangements (lazily evaluated) for big input are 7_169"):
+//    assertEquals(totalValidArrangements_lzy(bigInput), Some(7_169))
+
+//  test("..."):
+//    val combinationSize = 5 * 20
+//    val firstN = 1_000_000
+//    assertEquals(
+//      allCombinationsOf_lzy(combinationSize, values = Condition.valuesNes)
+//        .take(firstN)
+//        .map(_.length)
+//        .fold(0L)(_ + _)
+//        .toList,
+//      // List.fill[Int](firstN)(combinationSize)
+//      Stream.emit(combinationSize).repeatN(firstN).fold(0L)(_ + _).toList
+//    )
 
 object Day12Suite:
 
