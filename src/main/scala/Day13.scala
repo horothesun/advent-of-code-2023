@@ -7,9 +7,9 @@ object Day13:
 
   case class NonEmptyMatrix[A](rows: NonEmptyList[NonEmptyList[A]]):
 
-    val height: Int = rows.length
+    val topRow: NonEmptyList[A] = rows.head
 
-    def topRow: NonEmptyList[A] = rows.head
+    val height: Int = rows.length
 
     def rotatedCCW: NonEmptyMatrix[A] = transposed.hFlipped
     def transposed: NonEmptyMatrix[A] = NonEmptyMatrix(transpose(rows))
@@ -18,7 +18,7 @@ object Day13:
     // top & bottom NEMs given 0 < topHeight < height (=> height > 1)
     def hCut(topHeight: Int): Option[(NonEmptyMatrix[A], NonEmptyMatrix[A])] =
       val (topRows, bottomRows) = rows.toList.splitAt(topHeight)
-      (topRows.toNel, bottomRows.toNel).mapN((t, b) => (NonEmptyMatrix(rows = t), NonEmptyMatrix(rows = b)))
+      (topRows.toNel, bottomRows.toNel).mapN((t, b) => (NonEmptyMatrix(t), NonEmptyMatrix(b)))
 
   object NonEmptyMatrix:
 
@@ -45,3 +45,20 @@ object Day13:
             aux(newAcc, newRows)
 
       aux(acc = NonEmptyList.of(heads(rows)), tails(rows))
+
+  enum Terrain:
+    case Ash, Rocks
+
+  object Terrain:
+    def parse(c: Char): Option[Terrain] = c match
+      case '.' => Some(Ash)
+      case '#' => Some(Rocks)
+      case _   => None
+
+  case class Field(nem: NonEmptyMatrix[Terrain])
+
+  object Field:
+    def parse(input: List[String]): Option[Field] = input
+      .traverse(_.toList.traverse(Terrain.parse).flatMap(_.toNel))
+      .flatMap(_.toNel)
+      .map(tss => Field(NonEmptyMatrix(tss)))

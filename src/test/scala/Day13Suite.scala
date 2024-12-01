@@ -1,4 +1,5 @@
 import Day13.*
+import Day13.Terrain.*
 import Day13Suite.*
 import cats.data.NonEmptyList
 import munit.ScalaCheckSuite
@@ -41,9 +42,47 @@ class Day13Suite extends ScalaCheckSuite:
         case None         => fail("hCut failure")
     }
 
+  test("Field parse on small input 1"):
+    assertEquals(
+      Field.parse(smallInput1),
+      Some(
+        Field(
+          NonEmptyMatrix(
+            NonEmptyList.of(Rocks, Ash, Rocks, Rocks, Ash, Ash, Rocks, Rocks, Ash),
+            NonEmptyList.of(Ash, Ash, Rocks, Ash, Rocks, Rocks, Ash, Rocks, Ash),
+            NonEmptyList.of(Rocks, Rocks, Ash, Ash, Ash, Ash, Ash, Ash, Rocks),
+            NonEmptyList.of(Rocks, Rocks, Ash, Ash, Ash, Ash, Ash, Ash, Rocks),
+            NonEmptyList.of(Ash, Ash, Rocks, Ash, Rocks, Rocks, Ash, Rocks, Ash),
+            NonEmptyList.of(Ash, Ash, Rocks, Rocks, Ash, Ash, Rocks, Rocks, Ash),
+            NonEmptyList.of(Rocks, Ash, Rocks, Ash, Rocks, Rocks, Ash, Rocks, Ash)
+          )
+        )
+      )
+    )
+
 object Day13Suite:
 
 //  val bigInput: List[String] = getLinesFromFile("src/test/scala/day13_input.txt")
+
+  val smallInput1: List[String] = List(
+    "#.##..##.",
+    "..#.##.#.",
+    "##......#",
+    "##......#",
+    "..#.##.#.",
+    "..##..##.",
+    "#.#.##.#."
+  )
+
+  val smallInput2: List[String] = List(
+    "#...##..#",
+    "#....#..#",
+    "..##..###",
+    "#####.##.",
+    "#####.##.",
+    "..##..###",
+    "#....#..#"
+  )
 
   def nonEmptyMatrixGen[A](aGen: Gen[A]): Gen[NonEmptyMatrix[A]] =
     Gen.zip(Gen.choose(1, 10), Gen.choose(1, 10)).flatMap((w, h) => nonEmptyMatrixGen(aGen, w, h))
