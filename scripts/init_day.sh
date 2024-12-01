@@ -16,11 +16,11 @@ EOT
 touch "src/test/scala/day${AOC_DAY}_input.txt"
 
 cat <<EOT >> "src/test/scala/Day${AOC_DAY}Suite.scala"
+import Day${AOC_DAY}.*
+import Day${AOC_DAY}Suite.*
 import munit.ScalaCheckSuite
 import org.scalacheck.Gen
 import org.scalacheck.Prop.*
-import Day${AOC_DAY}.*
-import Day${AOC_DAY}Suite.*
 
 class Day${AOC_DAY}Suite extends ScalaCheckSuite:
 
