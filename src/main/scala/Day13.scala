@@ -1,3 +1,5 @@
+import Day13.Field.*
+import Day13.HMirror.*
 import Day13.NonEmptyMatrix.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
@@ -11,9 +13,9 @@ object Day13:
 
     val height: Int = rows.length
 
-    def rotatedCCW: NonEmptyMatrix[A] = transposed.hFlipped
+    def rotatedCW: NonEmptyMatrix[A] = transposed.vFlipped
     def transposed: NonEmptyMatrix[A] = NonEmptyMatrix(transpose(rows))
-    def hFlipped: NonEmptyMatrix[A] = NonEmptyMatrix(rows.reverse)
+    def vFlipped: NonEmptyMatrix[A] = NonEmptyMatrix(rows.map(_.reverse))
 
     // top & bottom NEMs given 0 < topHeight < height (=> height > 1)
     def hCut(topHeight: Int): Option[(NonEmptyMatrix[A], NonEmptyMatrix[A])] =
@@ -46,6 +48,13 @@ object Day13:
 
       aux(acc = NonEmptyList.of(heads(rows)), tails(rows))
 
+  extension [A](as: List[A])
+    def splitBy(separator: A): List[List[A]] = (as :+ separator)
+      .foldLeft[(List[A], List[List[A]])]((List.empty, List.empty)) { case ((currAcc, resAcc), newA) =>
+        if (newA == separator) (List.empty, resAcc :+ currAcc) else (currAcc :+ newA, resAcc)
+      }
+      ._2
+
   enum Terrain:
     case Ash, Rocks
 
@@ -55,10 +64,34 @@ object Day13:
       case '#' => Some(Rocks)
       case _   => None
 
-  case class Field(nem: NonEmptyMatrix[Terrain])
+  enum HMirror:
+    case Reflection, NoReflection
+
+  case class Field(nem: NonEmptyMatrix[Terrain]):
+    def reflectionTopHeights: List[Int] = reflectionTopHeightsAux(nem)
+    def reflectionLeftWidths: List[Int] = reflectionTopHeightsAux(nem.rotatedCW)
 
   object Field:
+
     def parse(input: List[String]): Option[Field] = input
-      .traverse(_.toList.traverse(Terrain.parse).flatMap(_.toNel))
+      .traverse(_.toList.traverse(Terrain.parse))
+      .flatMap(_.traverse(_.toNel))
       .flatMap(_.toNel)
       .map(tss => Field(NonEmptyMatrix(tss)))
+
+    def hMirror[A](top: NonEmptyMatrix[A], bottom: NonEmptyMatrix[A]): HMirror =
+      if (top.rows.reverse.zip(bottom.rows).forall((tr, br) => tr == br)) Reflection else NoReflection
+
+    def reflectionTopHeightsAux(nem: NonEmptyMatrix[Terrain]): List[Int] =
+      Range.inclusive(1, nem.height - 1).toList.mapFilter { topHeight =>
+        nem.hCut(topHeight).flatMap { (top, bottom) =>
+          hMirror(top, bottom) match
+            case Reflection   => Some(topHeight)
+            case NoReflection => None
+        }
+      }
+
+  def parse(inputs: List[String]): Option[List[Field]] = inputs.splitBy(separator = "").traverse(Field.parse)
+
+  def notesSummary(inputs: List[String]): Option[Long] =
+    parse(inputs).map(_.map(f => f.reflectionLeftWidths.sum + f.reflectionTopHeights.map(100 * _).sum).sum)

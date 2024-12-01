@@ -60,9 +60,45 @@ class Day13Suite extends ScalaCheckSuite:
       )
     )
 
+  test("List splitBy with internal separators"):
+    assertEquals(
+      List('a', 'b', 'c', '|', 'd', 'e', '|', 'f').splitBy(separator = '|'),
+      List(List('a', 'b', 'c'), List('d', 'e'), List('f'))
+    )
+
+  test("List splitBy with leading separator"):
+    assertEquals(
+      List('|', 'a', 'b', 'c').splitBy(separator = '|'),
+      List(List.empty, List('a', 'b', 'c'))
+    )
+
+  test("List splitBy with trailing separator"):
+    assertEquals(
+      List('a', 'b', 'c', '|').splitBy(separator = '|'),
+      List(List('a', 'b', 'c'), List.empty)
+    )
+
+  property("List splitBy with no separator returns the 'singleton-ed' list"):
+    forAll(Gen.listOf(Gen.alphaChar))(cs => assertEquals(cs.splitBy(separator = '|'), List(cs)))
+
+  test("splitBy(\"\") small input returns its 2 parts"):
+    assertEquals(smallInput.splitBy(separator = ""), List(smallInput1,smallInput2))
+
+  test("reflectionLeftWidths on small input 1 is List(5)"):
+    assertEquals(Field.parse(smallInput1).map(_.reflectionLeftWidths), Some(List(5)))
+
+  test("reflectionTopHeights on small input 2 is List(4)"):
+    assertEquals(Field.parse(smallInput2).map(_.reflectionTopHeights), Some(List(4)))
+
+  test("notes summary on small input is 405"):
+    assertEquals(notesSummary(smallInput), Some(405L))
+
+  test("notes summary on big input is 35_521"):
+    assertEquals(notesSummary(bigInput), Some(35_521L))
+
 object Day13Suite:
 
-//  val bigInput: List[String] = getLinesFromFile("src/test/scala/day13_input.txt")
+  val bigInput: List[String] = getLinesFromFile("src/test/scala/day13_input.txt")
 
   val smallInput1: List[String] = List(
     "#.##..##.",
@@ -83,6 +119,8 @@ object Day13Suite:
     "..##..###",
     "#....#..#"
   )
+
+  val smallInput: List[String] = smallInput1 ++ ("" :: smallInput2)
 
   def nonEmptyMatrixGen[A](aGen: Gen[A]): Gen[NonEmptyMatrix[A]] =
     Gen.zip(Gen.choose(1, 10), Gen.choose(1, 10)).flatMap((w, h) => nonEmptyMatrixGen(aGen, w, h))
