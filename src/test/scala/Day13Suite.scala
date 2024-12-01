@@ -82,7 +82,7 @@ class Day13Suite extends ScalaCheckSuite:
     forAll(Gen.listOf(Gen.alphaChar))(cs => assertEquals(cs.splitBy(separator = '|'), List(cs)))
 
   test("splitBy(\"\") small input returns its 2 parts"):
-    assertEquals(smallInput.splitBy(separator = ""), List(smallInput1,smallInput2))
+    assertEquals(smallInput.splitBy(separator = ""), List(smallInput1, smallInput2))
 
   test("reflectionLeftWidths on small input 1 is List(5)"):
     assertEquals(Field.parse(smallInput1).map(_.reflectionLeftWidths), Some(List(5)))
