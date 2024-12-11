@@ -25,7 +25,7 @@ object Day02:
     case Possible, Impossible
 
   object Validity:
-    given Monoid[Validity]:
+    given Monoid[Validity] with
       def empty: Validity = Possible
       def combine(x: Validity, y: Validity): Validity = if (x == Impossible || y == Impossible) Impossible else Possible
 
