@@ -8,7 +8,7 @@ object Day05:
   trait Identified:
     def id: Long
 
-  trait Constructed[A] with
+  trait Constructed[A]:
     def cons(id: Long): A
 
   case class Seed(id: Long) extends Identified

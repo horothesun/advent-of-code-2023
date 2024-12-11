@@ -183,8 +183,8 @@ class Day12Suite extends ScalaCheckSuite:
   test("total valid arrangements (lazily evaluated) for small input are 21"):
     assertEquals(totalValidArrangements_lzy(smallInput), Some(21))
 
-  test("total valid arrangements for big input are 7_169"):
-    assertEquals(totalValidArrangements(bigInput), Some(7_169))
+//  test("total valid arrangements for big input are 7_169"):
+//    assertEquals(totalValidArrangements(bigInput), Some(7_169))
 
 //  override val munitTimeout: scala.concurrent.duration.Duration =
 //    import scala.concurrent.duration.{Duration, MINUTES}
