@@ -13,42 +13,42 @@ object Day05:
 
   case class Seed(id: Long) extends Identified
   object Seed:
-    given Constructed[Seed] with
+    given Constructed[Seed]:
       def cons(id: Long): Seed = Seed(id)
 
   case class Soil(id: Long) extends Identified
   object Soil:
-    given Constructed[Soil] with
+    given Constructed[Soil]:
       def cons(id: Long): Soil = Soil(id)
 
   case class Fertilizer(id: Long) extends Identified
   object Fertilizer:
-    given Constructed[Fertilizer] with
+    given Constructed[Fertilizer]:
       def cons(id: Long): Fertilizer = Fertilizer(id)
 
   case class Water(id: Long) extends Identified
   object Water:
-    given Constructed[Water] with
+    given Constructed[Water]:
       def cons(id: Long): Water = Water(id)
 
   case class Light(id: Long) extends Identified
   object Light:
-    given Constructed[Light] with
+    given Constructed[Light]:
       def cons(id: Long): Light = Light(id)
 
   case class Temperature(id: Long) extends Identified
   object Temperature:
-    given Constructed[Temperature] with
+    given Constructed[Temperature]:
       def cons(id: Long): Temperature = Temperature(id)
 
   case class Humidity(id: Long) extends Identified
   object Humidity:
-    given Constructed[Humidity] with
+    given Constructed[Humidity]:
       def cons(id: Long): Humidity = Humidity(id)
 
   case class Location(id: Long) extends Identified
   object Location:
-    given Constructed[Location] with
+    given Constructed[Location]:
       def cons(id: Long): Location = Location(id)
 
     given Ordering[Location] = Ordering.fromLessThan((l, r) => l.id < r.id)
