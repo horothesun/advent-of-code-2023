@@ -42,11 +42,11 @@ class Day13Suite extends ScalaCheckSuite:
         case None         => fail("hCut failure")
     }
 
-  test("Field parse on small input 1"):
+  test("Pattern parse on small input 1"):
     assertEquals(
-      Field.parse(smallInput1),
+      Pattern.parse(smallInput1),
       Some(
-        Field(
+        Pattern(
           NonEmptyMatrix(
             NonEmptyList.of(Rocks, Ash, Rocks, Rocks, Ash, Ash, Rocks, Rocks, Ash),
             NonEmptyList.of(Ash, Ash, Rocks, Ash, Rocks, Rocks, Ash, Rocks, Ash),
@@ -85,15 +85,15 @@ class Day13Suite extends ScalaCheckSuite:
     assertEquals(smallInput.splitBy(separator = ""), List(smallInput1, smallInput2))
 
   test("reflectionLeftWidths on small input 1 is List(5)"):
-    assertEquals(Field.parse(smallInput1).map(_.reflectionLeftWidths), Some(List(5)))
+    assertEquals(Pattern.parse(smallInput1).map(_.reflectionLeftWidths), Some(List(5)))
 
   test("reflectionTopHeights on small input 2 is List(4)"):
-    assertEquals(Field.parse(smallInput2).map(_.reflectionTopHeights), Some(List(4)))
+    assertEquals(Pattern.parse(smallInput2).map(_.reflectionTopHeights), Some(List(4)))
 
-  test("notes summary on small input is 405"):
+  test("notes summary for small input is 405"):
     assertEquals(notesSummary(smallInput), Some(405L))
 
-  test("notes summary on big input is 35_521"):
+  test("notes summary for big input is 35_521"):
     assertEquals(notesSummary(bigInput), Some(35_521L))
 
 object Day13Suite:

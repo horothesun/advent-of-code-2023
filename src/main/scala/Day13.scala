@@ -1,6 +1,6 @@
-import Day13.Field.*
 import Day13.HMirror.*
 import Day13.NonEmptyMatrix.*
+import Day13.Pattern.*
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 import scala.annotation.tailrec
@@ -67,17 +67,17 @@ object Day13:
   enum HMirror:
     case Reflection, NoReflection
 
-  case class Field(nem: NonEmptyMatrix[Terrain]):
+  case class Pattern(nem: NonEmptyMatrix[Terrain]):
     def reflectionTopHeights: List[Int] = reflectionTopHeightsAux(nem)
     def reflectionLeftWidths: List[Int] = reflectionTopHeightsAux(nem.rotatedCW)
 
-  object Field:
+  object Pattern:
 
-    def parse(input: List[String]): Option[Field] = input
+    def parse(input: List[String]): Option[Pattern] = input
       .traverse(_.toList.traverse(Terrain.parse))
       .flatMap(_.traverse(_.toNel))
       .flatMap(_.toNel)
-      .map(tss => Field(NonEmptyMatrix(tss)))
+      .map(tss => Pattern(NonEmptyMatrix(tss)))
 
     def hMirror[A](top: NonEmptyMatrix[A], bottom: NonEmptyMatrix[A]): HMirror =
       if (top.rows.reverse.zip(bottom.rows).forall((tr, br) => tr == br)) Reflection else NoReflection
@@ -91,7 +91,7 @@ object Day13:
         }
       }
 
-  def parse(inputs: List[String]): Option[List[Field]] = inputs.splitBy(separator = "").traverse(Field.parse)
+  def parse(inputs: List[String]): Option[List[Pattern]] = inputs.splitBy(separator = "").traverse(Pattern.parse)
 
   def notesSummary(inputs: List[String]): Option[Long] =
-    parse(inputs).map(_.map(f => f.reflectionLeftWidths.sum + f.reflectionTopHeights.map(100 * _).sum).sum)
+    parse(inputs).map(_.foldMap(p => p.reflectionLeftWidths.sum + p.reflectionTopHeights.foldMap(100 * _)))
