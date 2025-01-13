@@ -156,7 +156,12 @@ object Day10:
     lazy val loop: Option[Loop] = for {
       s <- startPos
       case (fst, snd) <- exactly2Adjacent(s)
-      loop <- loopPaths(fstLast = fst, fstPath = NonEmptyList.one(s), sndLast = snd, sndPath = NonEmptyList.one(s))
+      loop <- loopPaths(
+                fstLast = fst,
+                fstPath = NonEmptyList.one(s),
+                sndLast = snd,
+                sndPath = NonEmptyList.one(s)
+              )
     } yield loop
 
     @tailrec
