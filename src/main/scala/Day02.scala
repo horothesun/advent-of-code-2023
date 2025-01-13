@@ -68,8 +68,7 @@ object Day02:
         .toList
         .traverse(_.split(" ") match
           case Array(n, c) => (Color.from(c), n.toIntOption).tupled
-          case _           => None
-        )
+          case _           => None)
         .map(cns => Reveal(cubesByColor = cns.toMap))
 
   case class Game(id: GameId, reveals: List[Reveal]):
