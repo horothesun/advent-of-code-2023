@@ -10,7 +10,7 @@ object Day01:
 
   opaque type Calibration = Int
   object Calibration:
-    given Monoid[Calibration] with
+    given Monoid[Calibration]:
       val empty: Calibration = 0
       def combine(c1: Calibration, c2: Calibration): Calibration = c1 + c2
 
