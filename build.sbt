@@ -1,6 +1,6 @@
 val catsVersion = "2.13.0"
 
-val kittensVersion = "3.4.0"
+val kittensVersion = "3.5.0"
 
 val catsParseVersion = "1.1.0"
 
