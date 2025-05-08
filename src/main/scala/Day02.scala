@@ -74,7 +74,7 @@ object Day02:
   case class Game(id: GameId, reveals: List[Reveal]):
     def validity(bag: Bag): Validity = reveals.foldMap(r => r.validity(bag))
 
-    def fewestCubes: Bag = reveals.foldMap(_.fewestCubes)(Bag.maxMonoid)
+    def fewestCubes: Bag = reveals.foldMap(_.fewestCubes)(using Bag.maxMonoid)
 
   object Game:
     def from(s: String): Option[Game] =
