@@ -27,7 +27,8 @@ object Day02:
   object Validity:
     given Monoid[Validity]:
       def empty: Validity = Possible
-      def combine(x: Validity, y: Validity): Validity = if (x == Impossible || y == Impossible) Impossible else Possible
+      def combine(x: Validity, y: Validity): Validity =
+        if x == Impossible || y == Impossible then Impossible else Possible
 
   case class Bag(cubesByColor: Map[Color, Int]):
     def getCubes(c: Color): Int = cubesByColor.getOrElse(c, 0)
@@ -57,7 +58,7 @@ object Day02:
 
     def validity(bag: Bag): Validity =
       def isPossibleByColor(c: Color): Validity =
-        if (cubesByColor.getOrElse(c, 0) <= bag.cubesByColor.getOrElse(c, 0)) Possible else Impossible
+        if cubesByColor.getOrElse(c, 0) <= bag.cubesByColor.getOrElse(c, 0) then Possible else Impossible
       Color.values.toList.foldMap(isPossibleByColor)
 
     def fewestCubes: Bag = Bag(cubesByColor = Color.values.toList.map(c => c -> getCubes(c)).toMap)

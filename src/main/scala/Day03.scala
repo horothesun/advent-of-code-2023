@@ -8,7 +8,7 @@ object Day03:
 
   case class Symbol(c: Char)
   object Symbol:
-    def from(c: Char): Option[Symbol] = if (c == DOT_CHAR || c.isDigit) None else Some(Symbol(c))
+    def from(c: Char): Option[Symbol] = if c == DOT_CHAR || c.isDigit then None else Some(Symbol(c))
 
   case class PartNumber(n: Int)
   object PartNumber:
@@ -52,10 +52,9 @@ object Day03:
     case Annotated(PartNumber(n), p, l) => Annotated(PartNumber(n), p, l)
 
   def getMatchingPart(apn: Annotated[PartNumber], as: Annotated[Symbol]): Option[Part] =
-    if (
-      as.pos0Based >= apn.pos0Based - 1 &&
+    if as.pos0Based >= apn.pos0Based - 1 &&
       as.pos0Based <= apn.pos0Based + apn.length
-    ) Some(Part(as.value, apn.value))
+    then Some(Part(as.value, apn.value))
     else None
 
   def getParts(prev: Row, curr: Row, next: Row): List[Part] =

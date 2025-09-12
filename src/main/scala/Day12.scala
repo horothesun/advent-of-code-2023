@@ -31,7 +31,7 @@ object Day12:
   case class Row[A](values: NonEmptyList[A]) derives Functor:
     def toContiguous: NonEmptyList[Contiguous[A]] = values.tail
       .foldLeft[NonEmptyList[Contiguous[A]]](NonEmptyList.one(Contiguous(values.head, reps = 1))) { case (cs, a) =>
-        if (a == cs.head.value) NonEmptyList(cs.head.inc, cs.tail) else Contiguous(a, reps = 1) :: cs
+        if a == cs.head.value then NonEmptyList(cs.head.inc, cs.tail) else Contiguous(a, reps = 1) :: cs
       }
       .reverse
 
@@ -88,7 +88,7 @@ object Day12:
     val valuesList = values.toList
     @tailrec
     def aux(n: Int, acc: List[NonEmptyList[A]]): List[NonEmptyList[A]] =
-      if (n == 1) acc
+      if n == 1 then acc
       else
         // generate the new set of combinations by prepending each value to each combination in acc
         val newAcc = for {
@@ -97,12 +97,12 @@ object Day12:
         } yield head :: tail
         aux(n - 1, newAcc)
 
-    if (length <= 0) List.empty else aux(length, valuesList.map(NonEmptyList.one))
+    if length <= 0 then List.empty else aux(length, valuesList.map(NonEmptyList.one))
 
   def allCombinationsOf_rec[A](length: Int, values: NonEmptySet[A]): List[NonEmptyList[A]] =
     val valuesNel = values.toNonEmptyList
     def aux(n: Int): NonEmptyList[NonEmptyList[A]] =
-      if (n == 1) valuesNel.map(NonEmptyList.one)
+      if n == 1 then valuesNel.map(NonEmptyList.one)
       else
         val tails = aux(n - 1)
         for {
@@ -110,12 +110,12 @@ object Day12:
           tail <- tails
         } yield head :: tail
 
-    if (length <= 0) List.empty else aux(length).toList
+    if length <= 0 then List.empty else aux(length).toList
 
   def allCombinationsOf_lzy[A](length: Int, values: NonEmptySet[A]): Stream[Pure, NonEmptyList[A]] =
     val lzyValues = Stream.emits(values.toList)
     def aux(n: Int): Stream[Pure, NonEmptyList[A]] =
-      if (n == 1)
+      if n == 1 then
         // for length 1, yield each value as a singleton NonEmptyList
         lzyValues.map(NonEmptyList.one)
       else
@@ -125,20 +125,20 @@ object Day12:
           tail <- aux(n - 1)
         } yield head :: tail
 
-    if (length <= 0) Stream.empty else aux(length)
+    if length <= 0 then Stream.empty else aux(length)
 
   enum ConditionsCheck:
     case Match, Fail
 
   def damagedGroupSizesCheck(conditions: Row[Condition], contiguousDamagedGroupSizes: List[Int]): ConditionsCheck =
     val damagedReps = conditions.toContiguous.collect { case Contiguous(Condition.Damaged, reps) => reps }
-    if (damagedReps == contiguousDamagedGroupSizes) Match else Fail
+    if damagedReps == contiguousDamagedGroupSizes then Match else Fail
 
   def getAllArrangements_lzy(rawConditions: Row[RawCondition]): Stream[Pure, Row[Condition]] =
     val contiguousRawConditions = rawConditions.toContiguous
     val allUnknownsSize = contiguousRawConditions.collect { case Contiguous(RawCondition.Unknown, reps) => reps }.sum
     val allCombos = allCombinationsOf_lzy(length = allUnknownsSize, values = Condition.valuesNes)
-    if (allUnknownsSize == 0) Stream.fromOption(rawConditions.values.traverse(_.toCondition).map(Row.apply))
+    if allUnknownsSize == 0 then Stream.fromOption(rawConditions.values.traverse(_.toCondition).map(Row.apply))
     else allCombos.map(hydrate(contiguousRawConditions, _))
 
   def getAllArrangements(rawConditions: Row[RawCondition]): NonEmptyList[Row[Condition]] =
