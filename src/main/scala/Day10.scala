@@ -234,7 +234,7 @@ object Day10:
             case NorthAndSouth               => (acc :+ Vertical, None)
             case WestAndEast                 => (acc, open)
             case NorthAndEast | SouthAndEast => (acc, Some(pipeType))
-            case NorthAndWest =>
+            case NorthAndWest                =>
               open match
                 case Some(SouthAndEast) => (acc :+ SouthToNorth, None)
                 case _                  => (acc, None)

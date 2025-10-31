@@ -35,8 +35,8 @@ object Day13:
       @tailrec
       def aux(acc: NonEmptyList[NonEmptyList[A]], rows: List[List[A]]): NonEmptyList[NonEmptyList[A]] =
         rows match
-          case Nil      => acc
-          case Nil :: _ => acc
+          case Nil           => acc
+          case Nil :: _      => acc
           case (_ :: _) :: _ =>
             val (newAcc, newRows) =
               rows
