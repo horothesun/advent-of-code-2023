@@ -73,7 +73,7 @@ object Day01:
   def getDigits(input: String): List[Digit] =
     @tailrec
     def aux(acc: List[Digit], s: String): List[Digit] = s.toList match
-      case Nil => acc
+      case Nil     => acc
       case _ :: cs =>
         val (optDigit, rest) = Digit.fromSlidingPrefixOf(s)
         val (newAcc, newRest) = optDigit.fold(ifEmpty = (acc, cs.mkString))(d => (d :: acc, rest))

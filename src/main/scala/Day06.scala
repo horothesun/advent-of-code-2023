@@ -69,7 +69,7 @@ object Day06:
       .unfold[Distance, Time](startHold) { hold =>
         holdBounds(hold) match
           case Bounds.Outside => None
-          case Bounds.Within =>
+          case Bounds.Within  =>
             getRaceOutcome(race, hold) match
               case Win             => None
               case Loss(travelled) => Some((travelled, nextHold(hold)))
@@ -104,7 +104,7 @@ object Day6RecursionSchemesOption:
   ): FCoalgebra[Time] = Coalgebra { hold =>
     holdBounds(hold) match
       case Bounds.Outside => None
-      case Bounds.Within =>
+      case Bounds.Within  =>
         getRaceOutcome(race, hold) match
           case Win     => None
           case Loss(_) => Some(nextHold(hold))
@@ -147,7 +147,7 @@ object Day6RecursionSchemesListF:
   ): FCoalgebra[Distance, Time] = Coalgebra { hold =>
     holdBounds(hold) match
       case Bounds.Outside => NilF
-      case Bounds.Within =>
+      case Bounds.Within  =>
         getRaceOutcome(race, hold) match
           case Win             => NilF
           case Loss(travelled) => ConsF(travelled, nextHold(hold))
