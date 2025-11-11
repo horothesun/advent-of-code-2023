@@ -105,7 +105,7 @@ object Day11:
     lazy val hSpaces: NonEmptyMatrix[Space] = rotatedCCW.vSpaces.rotatedCW
     lazy val vSpaces: NonEmptyMatrix[Space] = NonEmptyMatrix(
       pixels.rows.map { r =>
-        val space = if (r.forall(_ == EmptySpace)) Expanded else Normal
+        val space = if r.forall(_ == EmptySpace) then Expanded else Normal
         r.map(_ => space)
       }
     )
@@ -124,7 +124,7 @@ object Day11:
       } yield Image(rows)
 
     def duplicateAllEmptySpaceRows(ps: NonEmptyMatrix[Pixel]): NonEmptyMatrix[Pixel] = NonEmptyMatrix(
-      rows = ps.rows.flatMap(r => if (r.forall(_ == EmptySpace)) NonEmptyList.of(r, r) else NonEmptyList.one(r))
+      rows = ps.rows.flatMap(r => if r.forall(_ == EmptySpace) then NonEmptyList.of(r, r) else NonEmptyList.one(r))
     )
 
   def allUniquePairs[A](as: Set[A]): Set[(A, A)] =

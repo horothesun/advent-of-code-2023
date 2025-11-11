@@ -15,7 +15,7 @@ object Day09:
 
   def allReversedDifferences(h: History): List[NonEmptyList[Long]] =
     List.unfold[NonEmptyList[Long], NonEmptyList[Long]](init = h.values.reverse) { reversed =>
-      reversedDifferences(reversed).flatMap(diffs => if (reversed.forall(_ == 0)) None else Some((diffs, diffs)))
+      reversedDifferences(reversed).flatMap(diffs => if reversed.forall(_ == 0) then None else Some((diffs, diffs)))
     }
 
   def differences(vs: NonEmptyList[Long]): Option[NonEmptyList[Long]] = reversedDifferences(vs.reverse).map(_.reverse)
@@ -25,7 +25,7 @@ object Day09:
 
   def allPredictions(h: History): List[Long] =
     val triangle = NonEmptyList(h.values.reverse, allReversedDifferences(h)).reverse
-    val firstPred = if (triangle.head.forall(_ == 0)) 0 else triangle.head.head
+    val firstPred = if triangle.head.forall(_ == 0) then 0 else triangle.head.head
     triangle
       .foldLeft[(List[Long], Long)]((List.empty, firstPred)) { case ((preds, lastPred), revDiffs) =>
         val newPred = revDiffs.head + lastPred
@@ -40,7 +40,7 @@ object Day09:
 
   def allPastPredictions(h: History): List[Long] =
     val triangle = NonEmptyList(h.values, allDifferences(h)).reverse
-    val lastPred = if (triangle.head.forall(_ == 0)) 0 else triangle.head.head
+    val lastPred = if triangle.head.forall(_ == 0) then 0 else triangle.head.head
     triangle
       .foldLeft[(List[Long], Long)]((List.empty, lastPred)) { case ((preds, firstPred), revDiffs) =>
         val pastPred = revDiffs.head - firstPred

@@ -26,7 +26,7 @@ object Day07:
       override def combineK[A](x: Comparator[A], y: Comparator[A]): Comparator[A] = new Comparator[A]:
         override def compare: (A, A) => Int = (al, ar) =>
           val xCmp = x.compare(al, ar)
-          if (xCmp == 0) y.compare(al, ar) else xCmp
+          if xCmp == 0 then y.compare(al, ar) else xCmp
 
   enum CardLabel:
     case A, K, Q, J, T, `9`, `8`, `7`, `6`, `5`, `4`, `3`, `2`
@@ -54,12 +54,12 @@ object Day07:
   object Hand:
     val handTypeComparator: Comparator[Hand] = new Comparator[Hand]:
       override def compare: (Hand, Hand) => Int = (hl, hr) =>
-        if (hl.handType < hr.handType) -1 else if (hl.handType == hr.handType) 0 else 1
+        if hl.handType < hr.handType then -1 else if hl.handType == hr.handType then 0 else 1
     def nthCardComparator(nth: Hand => CardLabel): Comparator[Hand] = new Comparator[Hand]:
       override def compare: (Hand, Hand) => Int = (hl, hr) =>
         val nl = nth(hl)
         val nr = nth(hr)
-        if (nl < nr) -1 else if (nl == nr) 0 else 1
+        if nl < nr then -1 else if nl == nr then 0 else 1
 
     given Semigroup[Comparator[Hand]] = SemigroupK[Comparator].algebra
 
@@ -142,14 +142,14 @@ object Day07:
 
   case class HandJ(c1: CardLabelJ, c2: CardLabelJ, c3: CardLabelJ, c4: CardLabelJ, c5: CardLabelJ):
     lazy val handType: HandType =
-      if (containsJ)
+      if containsJ then
         CardLabelJ.values.toList.map(c => replaceJs(c).toHand.handType).toNel.fold(ifEmpty = HighCard)(_.maximum)
       else toHand.handType
 
     def containsJ: Boolean = List(c1, c2, c3, c4, c5).contains(CardLabelJ.J)
 
     def replaceJs(newC: CardLabelJ): HandJ =
-      val j2NewC: CardLabelJ => CardLabelJ = c => if (c == CardLabelJ.J) newC else c
+      val j2NewC: CardLabelJ => CardLabelJ = c => if c == CardLabelJ.J then newC else c
       HandJ(j2NewC(c1), j2NewC(c2), j2NewC(c3), j2NewC(c4), j2NewC(c5))
 
     def toHand: Hand = Hand(c1.toCardLabel, c2.toCardLabel, c3.toCardLabel, c4.toCardLabel, c5.toCardLabel)
@@ -157,12 +157,12 @@ object Day07:
   object HandJ:
     val handTypeComparator: Comparator[HandJ] = new Comparator[HandJ]:
       override def compare: (HandJ, HandJ) => Int = (hl, hr) =>
-        if (hl.handType < hr.handType) -1 else if (hl.handType == hr.handType) 0 else 1
+        if hl.handType < hr.handType then -1 else if hl.handType == hr.handType then 0 else 1
     def nthCardComparator(nth: HandJ => CardLabelJ): Comparator[HandJ] = new Comparator[HandJ]:
       override def compare: (HandJ, HandJ) => Int = (hl, hr) =>
         val nl = nth(hl)
         val nr = nth(hr)
-        if (nl < nr) -1 else if (nl == nr) 0 else 1
+        if nl < nr then -1 else if nl == nr then 0 else 1
 
     given Semigroup[Comparator[HandJ]] = SemigroupK[Comparator].algebra
 

@@ -51,7 +51,7 @@ object Day13:
   extension [A](as: List[A])
     def splitBy(separator: A): List[List[A]] = (as :+ separator)
       .foldLeft[(List[A], List[List[A]])]((List.empty, List.empty)) { case ((currAcc, resAcc), newA) =>
-        if (newA == separator) (List.empty, resAcc :+ currAcc) else (currAcc :+ newA, resAcc)
+        if newA == separator then (List.empty, resAcc :+ currAcc) else (currAcc :+ newA, resAcc)
       }
       ._2
 
@@ -80,7 +80,7 @@ object Day13:
       .map(tss => Pattern(NonEmptyMatrix(tss)))
 
     def hMirror[A](top: NonEmptyMatrix[A], bottom: NonEmptyMatrix[A]): HMirror =
-      if (top.rows.reverse.zip(bottom.rows).forall((tr, br) => tr == br)) Reflection else NoReflection
+      if top.rows.reverse.zip(bottom.rows).forall((tr, br) => tr == br) then Reflection else NoReflection
 
     def reflectionTopHeightsAux(nem: NonEmptyMatrix[Terrain]): List[Int] =
       Range.inclusive(1, nem.height - 1).toList.mapFilter { topHeight =>

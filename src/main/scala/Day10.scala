@@ -43,10 +43,10 @@ object Day10:
     lazy val east: Pos = Pos(row, col + 1)
 
     def cardinalDirectionOf(that: Pos): Option[CardinalDirection] =
-      if (north == that) Some(North)
-      else if (south == that) Some(South)
-      else if (west == that) Some(West)
-      else if (east == that) Some(East)
+      if north == that then Some(North)
+      else if south == that then Some(South)
+      else if west == that then Some(West)
+      else if east == that then Some(East)
       else None
 
   object Pos:
@@ -171,7 +171,8 @@ object Day10:
       sndLast: Pos,
       sndPath: NonEmptyList[Pos]
     ): Option[Loop] =
-      if (fstLast == sndLast) Some(Loop(fstPath :+ fstLast, sndPath :+ sndLast))
+      if fstLast == sndLast
+      then Some(Loop(fstPath :+ fstLast, sndPath :+ sndLast))
       else
         (
           nextUnvisited(fstLast, fstPath),
@@ -200,16 +201,17 @@ object Day10:
 
     def tileTypeAt(l: Loop, startAs: PipeType, pos: Pos): TileType =
       import TileType.*
-      if (l.allPositions.contains(pos)) OnLoop
+      if l.allPositions.contains(pos)
+      then OnLoop
       else
         val row = rows(pos.row).zipWithIndex.map { (tile, col) =>
           import TileRawType.*
-          val tileRawType = if (l.allPositions.contains(Pos(pos.row, col))) OnLoop else NotOnLoop
+          val tileRawType = if l.allPositions.contains(Pos(pos.row, col)) then OnLoop else NotOnLoop
           (tile, tileRawType)
         }
         val inversionsCount = inversionsToEast(fromCol = pos.col, startAs, row).length
         val isEven: Int => Boolean = _ % 2 == 0
-        if (isEven(inversionsCount)) OutsideLoop else InsideLoop
+        if isEven(inversionsCount) then OutsideLoop else InsideLoop
 
   object Field:
     def parse(input: List[String]): Option[Field] =

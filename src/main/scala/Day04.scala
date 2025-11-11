@@ -40,7 +40,7 @@ object Day04:
     case Nil       => 0
     case _ :: tail => intPow(2, tail.length)
 
-  def intPow(b: Int, e: Int): Long = if (e <= 0) 1 else if (e == 1) b else b * intPow(b, e - 1)
+  def intPow(b: Int, e: Int): Long = if e <= 0 then 1 else if e == 1 then b else b * intPow(b, e - 1)
 
   def getTotalPoints(cards: List[Card]): Long = cards.map(c => getPoints(c.getMatches)).sum
 
