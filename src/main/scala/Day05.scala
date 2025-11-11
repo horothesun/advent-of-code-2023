@@ -141,14 +141,16 @@ object Day05:
     case _ => None
 
   def split[A](by: A, as: List[A]): List[List[A]] =
-    val fakeRight = as.lastOption.map(l => if (l == by) List.empty[A] else List(by)).getOrElse(List.empty[A])
+    val fakeRight = as.lastOption.map(l => if l == by then List.empty[A] else List(by)).getOrElse(List.empty[A])
     val middle = (as ++ fakeRight)
       .foldLeft((List.empty[A], List.empty[List[A]])) { case ((group, acc), a) =>
-        if (a == by) (List.empty[A], acc.appended(group)) else (group.appended(a), acc)
+        if a == by then (List.empty[A], acc.appended(group)) else (group.appended(a), acc)
       }
       ._2
     val right =
-      as.lastOption.map(l => if (l == by) List(List.empty[A]) else List.empty[List[A]]).getOrElse(List.empty[List[A]])
+      as.lastOption
+        .map(l => if l == by then List(List.empty[A]) else List.empty[List[A]])
+        .getOrElse(List.empty[List[A]])
     middle ++ right
 
   def getMinLocation(seeds: List[Seed], cms: CategoryMappings): Option[Location] =
@@ -161,7 +163,8 @@ object Day05:
 //  def getExtendedSeeds(ns: List[Long]): Option[List[Seed]] =
 //    @tailrec
 //    def aux(ls: List[Long], accOpt: Option[List[Seed]]): Option[List[Seed]] =
-//      if (accOpt.isEmpty) None
+//      if accOpt.isEmpty
+//      then None
 //      else
 //        ls match
 //          case Nil            => accOpt

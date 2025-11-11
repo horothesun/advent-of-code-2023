@@ -30,7 +30,7 @@ object Day06:
 
   def getRaceOutcome(race: Race, hold: Time): RaceOutcome =
     val travelled = getTravelledDistance(race.allowance, hold)
-    if (travelled > race.record) Win else Loss(travelled)
+    if travelled > race.record then Win else Loss(travelled)
 
   def getTravelledDistance(allowance: Time, hold: Time): Distance =
     val raceDuration = allowance - hold
@@ -51,7 +51,7 @@ object Day06:
   def countWaysToLoseLeft(race: Race): Long =
     countWaysToLose(
       startHold = Time.zero,
-      holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
+      holdBounds = hold => if hold <= race.allowance then Bounds.Within else Bounds.Outside,
       nextHold = _.inc,
       race
     )
@@ -59,7 +59,7 @@ object Day06:
   def countWaysToLoseRight(race: Race): Long =
     countWaysToLose(
       startHold = race.allowance,
-      holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
+      holdBounds = hold => if hold >= Time.zero then Bounds.Within else Bounds.Outside,
       nextHold = _.dec,
       race
     )
@@ -79,7 +79,7 @@ object Day06:
   def countWaysToWin(race: Race): Long =
     val totalOutcomes = getTotalOutcomes(race.allowance)
     val lossesFromLeft = countWaysToLoseLeft(race)
-    val allLosses = lossesFromLeft + (if (lossesFromLeft == totalOutcomes) 0 else countWaysToLoseRight(race))
+    val allLosses = lossesFromLeft + (if lossesFromLeft == totalOutcomes then 0 else countWaysToLoseRight(race))
     totalOutcomes - allLosses
 
 /*
@@ -112,14 +112,14 @@ object Day6RecursionSchemesOption:
 
   def losingDistancesLeftCoAlg(race: Race): FCoalgebra[Time] =
     losingDistancesCoAlg(
-      holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
+      holdBounds = hold => if hold <= race.allowance then Bounds.Within else Bounds.Outside,
       nextHold = _.inc,
       race
     )
 
   def losingDistancesRightCoAlg(race: Race): FCoalgebra[Time] =
     losingDistancesCoAlg(
-      holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
+      holdBounds = hold => if hold >= Time.zero then Bounds.Within else Bounds.Outside,
       nextHold = _.dec,
       race
     )
@@ -155,14 +155,14 @@ object Day6RecursionSchemesListF:
 
   def losingDistancesLeftCoAlg(race: Race): FCoalgebra[Distance, Time] =
     losingDistancesCoAlg(
-      holdBounds = hold => if (hold <= race.allowance) Bounds.Within else Bounds.Outside,
+      holdBounds = hold => if hold <= race.allowance then Bounds.Within else Bounds.Outside,
       nextHold = _.inc,
       race
     )
 
   def losingDistancesRightCoAlg(race: Race): FCoalgebra[Distance, Time] =
     losingDistancesCoAlg(
-      holdBounds = hold => if (hold >= Time.zero) Bounds.Within else Bounds.Outside,
+      holdBounds = hold => if hold >= Time.zero then Bounds.Within else Bounds.Outside,
       nextHold = _.dec,
       race
     )
