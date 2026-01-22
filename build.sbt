@@ -27,7 +27,7 @@ lazy val root = project
   .settings(
     organization := "com.horothesun",
     name := "advent-of-code-2023",
-    scalaVersion := "3.7.4",
+    scalaVersion := "3.8.1",
     libraryDependencies ++= Seq(
       "org.typelevel" %% "cats-core" % catsVersion,
       "org.typelevel" %% "kittens" % kittensVersion,
