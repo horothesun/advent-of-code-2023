@@ -10,7 +10,7 @@ val fs2Version = "3.12.2"
 
 val drosteVersion = "0.10.0"
 
-val munitVersion = "1.2.2"
+val munitVersion = "1.2.3"
 
 val munitScalacheckVersion = "1.2.0"
 
