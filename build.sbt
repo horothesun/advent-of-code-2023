@@ -14,7 +14,7 @@ val munitVersion = "1.2.4"
 
 val munitScalacheckVersion = "1.2.0"
 
-val munitCatsEffectVersion = "2.1.0"
+val munitCatsEffectVersion = "2.2.0"
 
 val scalacheckVersion = "1.19.0"
 
