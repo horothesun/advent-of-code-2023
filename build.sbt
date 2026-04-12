@@ -12,7 +12,7 @@ val drosteVersion = "0.10.0"
 
 val munitVersion = "1.2.4"
 
-val munitScalacheckVersion = "1.2.0"
+val munitScalacheckVersion = "1.3.0"
 
 val munitCatsEffectVersion = "2.2.0"
 
