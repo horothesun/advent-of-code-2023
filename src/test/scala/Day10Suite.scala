@@ -209,23 +209,24 @@ class Day10Suite extends ScalaCheckSuite:
       Field.inversionsToEast(
         fromCol = 0,
         startAs = WestAndEast,
-        row = Vector(
-          (Ground, NotOnLoop),
-          (Ground, NotOnLoop),
-          (Pipe(NorthAndSouth), OnLoop),
-          (Ground, NotOnLoop),
-          (Ground, NotOnLoop),
-          (Pipe(NorthAndEast), OnLoop),
-          (Start, OnLoop),
-          (Pipe(SouthAndWest), OnLoop),
-          (Pipe(NorthAndSouth), OnLoop),
-          (Ground, NotOnLoop),
-          (Pipe(SouthAndEast), OnLoop),
-          (Pipe(WestAndEast), OnLoop),
-          (Pipe(WestAndEast), OnLoop),
-          (Pipe(NorthAndWest), OnLoop),
-          (Ground, NotOnLoop)
-        )
+        row =
+          Vector(
+            (Ground, NotOnLoop),
+            (Ground, NotOnLoop),
+            (Pipe(NorthAndSouth), OnLoop),
+            (Ground, NotOnLoop),
+            (Ground, NotOnLoop),
+            (Pipe(NorthAndEast), OnLoop),
+            (Start, OnLoop),
+            (Pipe(SouthAndWest), OnLoop),
+            (Pipe(NorthAndSouth), OnLoop),
+            (Ground, NotOnLoop),
+            (Pipe(SouthAndEast), OnLoop),
+            (Pipe(WestAndEast), OnLoop),
+            (Pipe(WestAndEast), OnLoop),
+            (Pipe(NorthAndWest), OnLoop),
+            (Ground, NotOnLoop)
+          )
       ),
       List(Vertical, NorthToSouth, Vertical, SouthToNorth)
     )
