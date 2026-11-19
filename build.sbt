@@ -6,7 +6,7 @@ val catsParseVersion = "1.1.0"
 
 val catsEffectVersion = "3.7.1"
 
-val fs2Version = "3.15.0"
+val fs2Version = "3.16.0"
 
 val drosteVersion = "0.10.0"
 
